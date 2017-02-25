@@ -1,6 +1,8 @@
 from discord.ext import commands
 
-
+"""
+For tournament commands i.e. |createTeam
+"""
 class Tournament():
     def __init__(self, bot):
         self.bot = bot

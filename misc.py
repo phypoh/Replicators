@@ -1,9 +1,9 @@
 from discord.ext import commands
 
 """
-For community commands i.e. |stats
+For general commands which don't fit into other categories. i.e. Set Default IGN.
 """
-class Community():
+class Misc():
     def __init__(self, bot):
         self.bot = bot
 
@@ -26,4 +26,4 @@ class Community():
 
 
 def setup(bot):
-    bot.add_cog(Community(bot))
+    bot.add_cog(Misc(bot))

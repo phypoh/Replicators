@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 
-startup_extensions = ["tournament", "community"]
+startup_extensions = ["tournament", "community", "misc"]
 
 bot = commands.Bot(command_prefix='|')
 
