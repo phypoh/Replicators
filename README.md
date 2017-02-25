@@ -1,5 +1,11 @@
 # Replicators
-
+Bot:
+1) Twitch mode 
+	Twitch accessory
+2) Tournament mode
+	Organise and facilitate tournament stuff
+3) Community mode
+	Stats, guild parties, etc.
 
 WIP Wishlist:
     Imagine a AI/Siri sort off assistant that could be used to not only work for notifying u and stuff but also for the app we will make
