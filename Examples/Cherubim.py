@@ -12,7 +12,9 @@ from discord.ext import commands
 import gamelocker
 from gamelocker.strings import pretty
 
+
 APIKEY = "INSERT API KEY HERE"
+
 date = "2017-01-01T08:25:30Z"
 
 bot = commands.Bot(command_prefix='!')
@@ -215,5 +217,7 @@ async def embed(): # https://leovoel.github.io/embed-visualizer/
     embed.add_field(name="🙄", value="an informative error should show up, and this view will remain as-is until all issues are fixed")
     embed.add_field(name="<:thonkang:219069250692841473>", value="???")
     
+
     await bot.say(content="this `supports` __a__ **subset** *of* ~~markdown~~ 😃 ```js\nfunction foo(bar) {\n  console.log(bar);\n}\n\nfoo(1);```", embed=embed)
 bot.run("INSERT BOT TOKEN HERE")
+
