@@ -12,7 +12,7 @@ from discord.ext import commands
 import gamelocker
 from gamelocker.strings import pretty
 
-APIKEY = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI4OGY2YjA0MC1kY2I1LTAxMzQtNWRjOC0wMjQyYWMxMTAwMDQiLCJpc3MiOiJnYW1lbG9ja2VyIiwib3JnIjoicGh5cG9oLWdtYWlsLWNvbSIsImFwcCI6Ijg4ZjRlZjEwLWRjYjUtMDEzNC01ZGM3LTAyNDJhYzExMDAwNCIsInB1YiI6InNlbWMiLCJ0aXRsZSI6InZhaW5nbG9yeSIsInNjb3BlIjoiY29tbXVuaXR5IiwibGltaXQiOjEwfQ.W2kh0cyVTEtaphP9V0E4C-vTL-UVq5gziAfoat0Jlc4"
+APIKEY = ENTER_TOKEN_HERE
 date = "2017-01-01T08:25:30Z"
 
 bot = commands.Bot(command_prefix='!')
@@ -159,4 +159,4 @@ async def angel():
     await bot.say("Hush, no one has seen Angel. Legend tells that she lives among the Clouds.")
     
   
-bot.run('MjgyNTY0ODYzMDMxNjQwMDY0.C4oYQg.4ZUCMtVMQnbg3JuDxtdLbO7cx0U')
+bot.run(ENTER_TOKEN_HERE)
