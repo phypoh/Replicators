@@ -108,7 +108,7 @@ def profile_a(IGN):
         embed.add_field(name= '**Kills per game:**', value = round(kills/games, 1))
         embed.add_field(name= '**Assists per game:**', value = round(assists/games, 1))
         embed.add_field(name= '**Deaths per game:**', value = round(deaths/games, 1))
-        embed.add_field(name= '**Average KDA:**', value = round((kills+deaths)/games, 1))
+        embed.add_field(name= '**Average KDA:**', value = round((kills+assists)/deaths, 1))
         return(embed)  
     except:
         return("Not Found.")
