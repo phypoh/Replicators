@@ -8,9 +8,10 @@ import datetime
 import discord
 from discord.ext import commands
 import TOOL_module as tools
+from config_secrets import secrets
 
 # VG Variables--
-keyVG = ""  # VG_API_TOKEN_HERE
+keyVG = secrets['VGAPI']  # VG_API_TOKEN_HERE
 apiVG = gamelocker.Gamelocker(keyVG).Vainglory()  # API OBJECT
 
 # GETS a PLAYERS life time INFORMATION
