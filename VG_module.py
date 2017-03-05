@@ -414,12 +414,12 @@ class Vg():
         self.bot = bot
 
     @commands.command()
-    async def vgperformance(self, player_name="", days="7", game_type=""):
+    async def stats(self, player_name="", days="7", game_type=""):
         """Gets a players performance in the past days.
 
                 >vgperformance (player_name) (days) (game_type)
             player_name   ~   name of player to search for
-            days          ~   day range to search from                     ~   default: 7, requirements: maximum: 93, minimum: 1
+            days          ~   day range to search from ~   default: 7, requirements: maximum: 93, minimum: 1
             game_type     ~   game type you would like performance check   ~   options: casual, ranked, royal, blitz
 
         """
@@ -474,13 +474,12 @@ class Vg():
         await self.bot.edit_message(msg, embed=getPlayerPerformanceVG(player_name, days, game_type))  # RUNS PERFORMANCE FETCH and UPDATES MESSAGE once DONE
 
     @commands.command()
-    async def vgcheckplayer(self, player_name="", mode=""):
+    async def ign(self, player_name="", mode=""):
         """Checks if player exist in vainglory.
 
                 >vgcheckplayer (player_name) (mode)
             player_name   ~   name of player to check for
-            mode          ~   user or dev mode              ~   default: user, options: user, dev
-
+            mode          ~   user or dev mode ~ default: user, options: user, dev
         """
 
         if player_name == "":
