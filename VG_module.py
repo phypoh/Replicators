@@ -8,11 +8,13 @@ import datetime
 import discord
 from discord.ext import commands
 import TOOL_module as tools
+
 from config_secrets import secrets
 import dateutil.parser
 
+
 # VG Variables--
-keyVG = secrets['VGAPI']  # VG_API_TOKEN_HERE
+keyVG = ""  # VG_API_TOKEN_HERE
 apiVG = gamelocker.Gamelocker(keyVG).Vainglory()  # API OBJECT
 
 # DISCORD EMBED VARIABLES--
@@ -1054,7 +1056,6 @@ class Vg():
 
                 >stats (player_name) (server) (days) (game_type)
             player_name   ~   name of player to search for
-
             server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sg, ea, sa
             days          ~   day range to search from                     ~   default: 7, requirements: maximum: 93, minimum: 1
             game_type     ~   game type you would like performance check   ~   default: any, options: any, casual, ranked, royal, blitz
@@ -1151,21 +1152,16 @@ class Vg():
 
     @commands.command()
     async def player(self, player_name="", server="na", mode="user", auto="False"):
-
         """Checks if player exist in vainglory.
 
-                >player (player_name) (mode)
+                >player (player_name) (server) (mode)
             player_name   ~   name of player to check for
             server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sg, ea, sa
             mode          ~   user or dev mode                             ~   default: user, options: user, dev
 
             Example:
-<<<<<<< HEAD
                 >player player1 na user
 
-=======
-                >player player1 na casual
->>>>>>> origin/master
         """
 
         # AUTO IS A SECRET VARIABLE THAT MAKES COMPUTER CHECK EVERY SERVER FOR PLAYER !!!WAIST OF API KEY!!!
@@ -1224,9 +1220,9 @@ class Vg():
 
     @commands.command()
     async def match(self, player_name="", server="na", game_type="any", auto="False"):
-        """Checks if player exist in vainglory.
+        """Fetched the latest Vainglory match.
 
-                >player (player_name) (mode)
+                >player (player_name) (server) (game_type)
             player_name   ~   name of player to check for
             server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sg, ea, sa
             game_type     ~   game type you would like performance check   ~   default: any, options: any, casual, ranked, royal, blitz
