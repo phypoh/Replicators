@@ -9,6 +9,10 @@ import discord
 from discord.ext import commands
 import TOOL_module as tools
 
+from config_secrets import secrets
+import dateutil.parser
+
+
 # VG Variables--
 keyVG = ""  # VG_API_TOKEN_HERE
 apiVG = gamelocker.Gamelocker(keyVG).Vainglory()  # API OBJECT
@@ -246,7 +250,8 @@ def getPlayerPerformanceVG(name, server="", days=7, game="", auto=False):
     size = len(matches) - 1
     for match in matches:
         if matchNum == size:  # If MATCH is the FIRST MATCH then GET DATA
-            latestmatch = str(match.createdAt)
+            latestmatchraw = dateutil.parser.parse(match.createdAt)
+            latestmatch = latestmatchraw.strftime('%d/%m/%Y %H:%M:%S') + " GMT"            
 
         gameMode.append(str(match.gameMode))
         duration.append(match.duration)
