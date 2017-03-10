@@ -251,7 +251,7 @@ class Vg():
         # Check that GAMETYPE is VALID
         if game_type != "" and tools.isIntTOOL(game_type) == False:
 
-            if game_type in giveGameModeVG():  # GAMETYPE is VALID
+            if game_type in giveGameModeVG:  # GAMETYPE is VALID
                 notice += " from " + game_type + " games"
 
                 # If GAMETYPE is ANY turn to BLANK
