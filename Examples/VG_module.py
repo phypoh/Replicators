@@ -1,11 +1,7 @@
-# VG Functions:
-"""
-List of functions in this script:
-    getPlayerInfoVG(name, server="", mode="", auto=False)
-    getPlayerPerformanceVG(name, server="", days=7, game="", auto=False)
-    getLatestMatchVG(name, server, game, auto)
-"""
+# VG Module:
+# Functions using the VG API. Functions using Discord libraries will be marked by, "!!!DISCORD!!!", in their description.
 
+# IMPORTS
 import gamelocker
 from gamelocker.strings import pretty
 import datetime
@@ -13,9 +9,9 @@ import discord
 from discord.ext import commands
 import TOOL_module as tools
 
+from config_secrets import secrets
 import dateutil.parser
 
-from VG_toolbox import giveKarmaVG, giveMatchVG, giveSkillTierVG, giveGameModeVG, giveServerList
 
 # VG Variables--
 keyVG = ""  # VG_API_TOKEN_HERE
@@ -23,9 +19,7 @@ apiVG = gamelocker.Gamelocker(keyVG).Vainglory()  # API OBJECT
 
 # DISCORD EMBED VARIABLES--
 botImageDISCORD = "http://i63.tinypic.com/9k6xcj.jpg"  # URL of BOTS IMAGE
-signatureDISCORD = "Thanks to SEMC and MadGlory made with love ~ xoxo"  # String used in FOOTER as MESSAGE
-
-
+signatureDISCORD = "Thanks to SEMC made with love ~ xoxo"  # String used in FOOTER as MESSAGE
 
 # GETS a PLAYERS life time INFORMATION
 def getPlayerInfoVG(name, server="", mode="", auto=False):
@@ -42,18 +36,33 @@ def getPlayerInfoVG(name, server="", mode="", auto=False):
     print(filterVG)
 
     if auto == True:
-        for tryserver in giveServerList:
+
+        try:  # TRY to find MATCHES in NA
+            matches = apiVG.matches(filterVG, "na")
+
+        except:  # If NOTHING is FOUND then search EU
             try:
-                matches = apiVG.matches(filterVG, tryserver)
-            except:
-                matches = 0
-                
-        if matches == 0:
-            return "Couldn't get any matches for **" + str(name) + "** from the past 31 days in any server!"  # RETURN if player MATCHES AREN'T FOUND
+                matches = apiVG.matches(filterVG, "eu")
+
+            except:  # If NOTHING is FOUND then search SEA
+                try:
+                    matches = apiVG.matches(filterVG, "sg")
+
+                except:  # If NOTHING is FOUND then search EA
+                    try:
+                        matches = apiVG.matches(filterVG, "ea")
+
+                    except:  # If NOTHING is FOUND then search SA
+                        try:
+                            matches = apiVG.matches(filterVG, "sa")
+
+                        except:
+                            return "Couldn't get any matches for **" + str(name) + "** from the past 31 days in any server!"  # RETURN if player MATCHES AREN'T FOUND
 
     elif auto == False:
         try:  # GIVEN the SERVER try to FIND MATCHES for PLAYER
             matches = apiVG.matches(filterVG, server)
+
         except:
             return "Couldn't get any matches for **" + str(name) + "** from the past 31 days in " + str(server) + " server!"
 
@@ -163,7 +172,6 @@ def getPlayerInfoVG(name, server="", mode="", auto=False):
     #     return "The player **" + name + "** was found in the Vainglory servers in the past 31 days!"
     # if mode == "dev":  # If MODE is DEV send ID with MESSAGE
     #     return "The player **" + name + "** was found in the Vainglory servers in the past 31 days! ID: " + id
-    
 
 
 # Get a PLAYERS performance from RANGE of DAYS with the players NAME
@@ -228,7 +236,7 @@ def getPlayerPerformanceVG(name, server="", days=7, game="", auto=False):
             return "Couldn't get any matches for **" + str(name) + "** from the past " + str(days) + "days in the server in " + str(server) + " server!"
 
     else:
-        print("Error")
+        print("!!!HUGE ERROR!!!")
         return "!!!HUGE ERROR!!!"
 
     # MATCH VARIABLES
@@ -494,7 +502,267 @@ def getPlayerPerformanceVG(name, server="", days=7, game="", auto=False):
 
     # SEND the EMBED
     return embed
-    
+
+# Gives KARMA as a TITLE
+def giveKarmaVG(karma, mode=0):
+    # CHECK that KARMA is VALID
+    if tools.isIntTOOL(karma) == False:
+        return "Wow that's some crazy karma!"
+    karma = int(karma)  # Convert KARMA to INT to prevent ERRORS
+
+    # CHANGE KARMA from a NUMBER to a STRING
+    if karma == 0:
+        if mode == 1:
+            return "http://i66.tinypic.com/2vsmdxi.jpg"
+
+        return "Bad Karma"
+
+    elif karma == 1:
+        if mode == 1:
+            return "http://i63.tinypic.com/2a9wrr7.jpg"
+
+        return "Good Karma"
+
+    elif karma == 2:
+        if mode == 1:
+            return "http://i64.tinypic.com/sd1t3b.jpg"
+
+        return "Great Karma"
+
+    else:
+        if mode == 1:
+            return "http://i63.tinypic.com/9k6xcj.jpg"
+
+        return "Wow that's some crazy karma!"
+
+# GIVES the IGN for MATCH MODE
+def giveMatchVG(match, mode=0):
+    # Check that MATCH is VALID
+    if tools.isIntTOOL(match) == True:
+        return "That one match..."
+    match = str(match)  # Convert MATCH to STRING to prevent ERRORS
+
+    # SEND the PRETTY version of GAMEMODE
+    if match == "blitz_pvp_ranked":
+        return "Blitz"
+
+    elif match == "casual_aral":
+        return "Battle Royal"
+
+    elif match == "private":
+        return "Private Casual"
+
+    elif match == "private_party_draft_match":
+        return "Private Draft"
+
+    elif match == "private_party_blitz_match":
+        return "Private Blitz"
+
+    elif match == "private_party_aral_match":
+        return "Private Battle Royal"
+
+    elif match == "casual":
+        return "Casual Match"
+
+    elif match == "ranked":
+        return "Rank Match"
+
+    else:  # If NO GAMEMODE was found SEND the RAW GAMEMODE
+        return str(match)
+
+# Gives SKILL TIER as a TITLE
+def giveSkillTierVG(tier, mode=0):
+    if tools.isIntTOOL(tier) == False:
+        return "Unreal Rank"
+
+    tier = int(tier)  # Convert to INT to prevent ERRORS
+
+    if tier == -1:
+        if mode == 1:
+            return "http://i64.tinypic.com/30veur5.jpg"
+
+        return "Un-Ranked"
+
+    elif tier == 0:
+        if mode == 1:
+            return "http://i66.tinypic.com/spj77t.jpg"
+
+        return "Just Beginning - B"
+
+    elif tier == 1:
+        if mode == 1:
+            return "http://i67.tinypic.com/24ct7qu.jpg"
+
+        return "Just Beginning - S"
+
+    elif tier == 2:
+        if mode == 1:
+            return "http://i63.tinypic.com/14kytzl.jpg"
+
+        return "Just Beginning - G"
+
+    elif tier == 3:
+        if mode == 1:
+            return "http://i66.tinypic.com/w8x5ci.jpg"
+
+        return "Getting There - B"
+
+    elif tier == 4:
+        if mode == 1:
+            return "http://i65.tinypic.com/2rc3f39.jpg"
+
+        return "Getting There - S"
+
+    elif tier == 5:
+        if mode == 1:
+            return "http://i66.tinypic.com/15guo43.jpg"
+
+        return "Getting There - G"
+
+    elif tier == 6:
+        if mode == 1:
+            return "http://i63.tinypic.com/10zbkuw.jpg"
+
+        return "Rock Solid - B"
+
+    elif tier == 7:
+        if mode == 1:
+            return "http://i64.tinypic.com/2igmao7.jpg"
+
+        return "Rock Solid - S"
+
+    elif tier == 8:
+        if mode == 1:
+            return "http://i64.tinypic.com/m9ngpc.jpg"
+
+        return "Rock Solid - G"
+
+    elif tier == 9:
+        if mode == 1:
+            return "http://i63.tinypic.com/99jgg4.jpg"
+
+        return "Worthy Foe - B"
+
+    elif tier == 10:
+        if mode == 1:
+            return "http://i64.tinypic.com/nnksv9.jpg"
+
+        return "Worthy Foe - S"
+
+    elif tier == 11:
+        if mode == 1:
+            return "http://i68.tinypic.com/120kpk9.jpg"
+
+        return "Worthy Foe - G"
+
+    elif tier == 12:
+        if mode == 1:
+            return "http://i64.tinypic.com/4rxoid.jpg"
+
+        return "Got Swagger - B"
+
+    elif tier == 13:
+        if mode == 1:
+            return "http://i68.tinypic.com/2lnib61.jpg"
+
+        return "Got Swagger - S"
+
+    elif tier == 14:
+        if mode == 1:
+            return "http://i63.tinypic.com/oqjgau.jpg"
+
+        return "Got Swagger - G"
+
+    elif tier == 15:
+        if mode == 1:
+            return "http://i65.tinypic.com/dphenn.jpg"
+
+        return "Credible Threat - B"
+
+    elif tier == 16:
+        if mode == 1:
+            return "http://i66.tinypic.com/2dr9law.jpg"
+
+        return "Credible Threat - S"
+
+    elif tier == 17:
+        if mode == 1:
+            return "http://i65.tinypic.com/20h6cti.jpg"
+
+        return "Credible Threat - G"
+
+    elif tier == 18:
+        if mode == 1:
+            return "http://i65.tinypic.com/288vxuc.jpg"
+
+        return "The Hotness - B"
+
+    elif tier == 19:
+        if mode == 1:
+            return "http://i68.tinypic.com/2e3rby8.jpg"
+
+        return "The Hotness - S"
+
+    elif tier == 20:
+        if mode == 1:
+            return "http://i68.tinypic.com/dq3meg.jpg"
+
+        return "The Hotness - G"
+
+    elif tier == 21:
+        if mode == 1:
+            return "http://i65.tinypic.com/2hpm0d3.jpg"
+
+        return "Simply Amazing - B"
+
+    elif tier == 22:
+        if mode == 1:
+            return "http://i66.tinypic.com/2b19ap.jpg"
+
+        return "Simply Amazing - S"
+
+    elif tier == 23:
+        if mode == 1:
+            return "http://i65.tinypic.com/im5f13.jpg"
+
+        return "Simply Amazing - G"
+
+    elif tier == 24:
+        if mode == 1:
+            return "http://i65.tinypic.com/vp8f8l.jpg"
+
+        return "Pinnacle of Awesome - B"
+
+    elif tier == 25:
+        if mode == 1:
+            return "http://i68.tinypic.com/5wjhvs.jpg"
+
+        return "Pinnacle of Awesome - S"
+
+    elif tier == 26:
+        if mode == 1:
+            return "http://i65.tinypic.com/10r7rrs.jpg"
+
+        return "Pinnacle of Awesome- G"
+
+    elif tier == 27:
+        if mode == 1:
+            return "http://i68.tinypic.com/27y8mdw.jpg"
+
+        return "Vainglorious - B"
+
+    elif tier == 28:
+        if mode == 1:
+            return "http://i64.tinypic.com/1znqsds.jpg"
+
+        return "Vainglorious - S"
+
+    elif tier == 29:
+        if mode == 1:
+            return "http://i65.tinypic.com/e6x74n.jpg"
+
+        return "Vainglorious - G"
+
 def getLatestMatchVG(name, server, game, auto):
     name = str(name)  # Convert to STRING prevent ERRORS
     server = str(server)  # Convert to STRING prevent ERRORS
@@ -770,3 +1038,242 @@ def getLatestMatchVG(name, server, game, auto):
     # SEND the EMBED
     return embed
 
+
+# CLASS containing ALL COMMANDS for THIS MODULE
+class Vg():
+    """All the commands in relation to Vainglory.
+            Made with love and some Vainglory api, python - gamelocker.
+    """
+
+    def __init__(self, bot):
+        self.bot = bot
+
+    @commands.command()
+    async def stats(self, player_name="", server="na", days="7", game_type="any", auto="False"):
+        """Gets a players performance in the past days.
+                >stats (player_name) (server) (days) (game_type)
+            player_name   ~   name of player to search for
+            server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sg, ea, sa
+            days          ~   day range to search from                     ~   default: 7, requirements: maximum: 93, minimum: 1
+            game_type     ~   game type you would like performance check   ~   default: any, options: any, casual, ranked, royal, blitz
+            example:
+                >stats player1 na 10 casual
+        """
+
+        # AUTO IS A SECRET VARIABLE THAT MAKES COMPUTER CHECK EVERY SERVER FOR PLAYER !!!WAIST OF API KEY!!!
+        # FALSE = WILL ONLY CHECK GIVEN SERVER, TRUE = WILL CHECK ALL SERVERS UNTIL FINDING PLAYER
+
+        # MESSAGE the USER if NO NAME was GIVEN
+        if player_name == "":
+            await self.bot.say("You need to give a players name at least...")
+            return
+
+        # MESSAGE the USER if NAME GIVEN is TOO SHORT
+        if len(str(player_name)) < 3:
+            await self.bot.say("That isn't a valid name... :sweat_smile:")
+            return
+
+        # MESSAGE the USER if a NUMBER was GIVEN
+        if tools.isIntTOOL(player_name) == True:
+            await self.bot.say(str(player_name) + " isn't a valid name... :sweat_smile:")
+            return
+
+        notice = "Looking at matches for " + str(player_name)
+
+        # Check that SERVER is VALID
+        if server == "na" or server == "eu" or server == "sg" or server == "ea" or server == "sa":
+            notice += " in " + str(server) + " servers"
+
+        else:
+            await self.bot.say(str(server) + " isn't a valid server name... :sweat_smile:")
+            return
+
+        # CHECK DAYS to be a VALID NUMBER
+        if tools.isIntTOOL(days) == True:
+            days = int(days)  # Convert DAYS to INT to prevent ERRORS
+
+            if days > 93:
+                days = 93  # MAKE DAYS a VALID RANGE
+                notice += " from the past " + str(days) + " days"  # ADD to NOTICE that DATE
+
+            elif days <= 0:
+                days = 1  # MAKE DAYS a VALID RANGE
+                notice += " from the past " + str(days) + " days"  # ADD to NOTICE that DATE
+
+            else:  # LEAVE DAYS ALONE
+                notice += " from the past " + str(days) + " days"  # ADD to NOTICE that DATE
+
+        else:  # DATE is INVALID so THEN MESSAGE USER
+            await self.bot.say("Sorry but " + str(days) + " isn't a valid number... :sweat_smile:")  # If DAYS is an INVALID number TELL USER
+            return
+
+        # Check that GAMETYPE is VALID
+        if game_type != "" and tools.isIntTOOL(game_type) == False:
+
+            if game_type == "any" or game_type == "casual" or game_type == "rank" or game_type == "royal" or game_type == "blitz":  # GAMETYPE is VALID
+                notice += " from " + game_type + " games"
+
+                # If GAMETYPE is ANY turn to BLANK
+                if game_type == "any":
+                    game_type = ""
+
+            else:  # GAMETYPE isn't VALID
+                await self.bot.say("Sorry but " + str(game_type) + " isn't a valid game type... :sweat_smile:")
+                return
+
+        # If GAMETYPE is VALID then MESSAGE user
+        if game_type != "" and tools.isIntTOOL(game_type) == True:
+            await self.bot.say("Sorry but " + str(game_type) + " isn't a valid game type... :sweat_smile:")
+            return
+
+        # END of NOTICE
+        notice += "... :eyes:"
+
+        # Converts AUTO to it's proper BOOLEAN
+        if auto == "False" or auto == "false":
+            auto = False
+        elif auto == "True" or auto == "true":
+            auto = True
+            notice += " - AUTO: True"
+
+        else:
+            await self.bot.say("That isn't a valid secret!")
+            return
+
+        # NOTICE USER that THEIR COMMAND is being PROCESSED
+        msg = await self.bot.say(notice)
+        # RUNS PERFORMANCE FETCH and UPDATES MESSAGE once DONE
+        await self.bot.edit_message(msg, embed=getPlayerPerformanceVG(player_name, server, days, game_type, auto))
+
+    @commands.command()
+    async def player(self, player_name="", server="na", mode="user", auto="False"):
+        """Checks if player exist in vainglory.
+                >player (player_name) (server) (mode)
+            player_name   ~   name of player to check for
+            server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sg, ea, sa
+            mode          ~   user or dev mode                             ~   default: user, options: user, dev
+            Example:
+                >player player1 na user
+        """
+
+        # AUTO IS A SECRET VARIABLE THAT MAKES COMPUTER CHECK EVERY SERVER FOR PLAYER !!!WAIST OF API KEY!!!
+        # FALSE = WILL ONLY CHECK GIVEN SERVER, TRUE = WILL CHECK ALL SERVERS UNTIL FINDING PLAYER
+
+        notice = "Looking for "  # DEFAULT NOTICE SENT to USER!
+
+        # Check that a NAME was GIVEN
+        if player_name == "":
+            await self.bot.say("You need to give a players name... :sweat_smile:")
+            return
+
+        # Check that NAME is VALID
+        if tools.isIntTOOL(player_name) == True or len(player_name) < 3:
+            await self.bot.say(str(player_name) + " isn't a valid name!")
+
+        notice += str(player_name)
+
+        # Check that SERVER is VALID
+        if server == "na" or server == "eu" or server == "sg" or server == "ea" or server == "sa":
+            notice += " in " + str(server) + " servers"
+
+        else:
+            await self.bot.say(str(server) + " isn't a valid server name... :sweat_smile:")
+            return
+
+        notice += "... :eyes:"
+
+        # Check that MODE is VALID
+        if mode == "user" or mode == "dev":
+            pass
+
+        else:
+            await self.bot.say(str(mode) + " isn't a valid mode... :sweat_smile:")
+            return
+
+
+        # Converts AUTO to it's proper BOOLEAN
+        if auto == "False" or auto == "false":
+            auto = False
+
+        elif auto == "True" or auto == "true":
+            auto = True
+
+            notice += " - AUTO: True"
+
+        else:
+            await self.bot.say("That isn't a valid secret!")
+            return
+
+        player_name = str(player_name)  # Convert PLAYER_NAME to STRING to prevent errors
+
+        msg = await self.bot.say(notice)  # NOTICE USER that THEIR COMMAND is being PROCESSED
+        await self.bot.edit_message(msg, embed=getPlayerInfoVG(player_name, server, mode, auto))  # RUNS ID TEST
+
+
+    @commands.command()
+    async def match(self, player_name="", server="na", game_type="any", auto="False"):
+        """Fetched the latest Vainglory match.
+                >player (player_name) (server) (game_type)
+            player_name   ~   name of player to check for
+            server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sg, ea, sa
+            game_type     ~   game type you would like performance check   ~   default: any, options: any, casual, ranked, royal, blitz
+            Example:
+                >match player1 na casual
+        """
+
+        # AUTO IS A SECRET VARIABLE THAT MAKES COMPUTER CHECK EVERY SERVER FOR PLAYER !!!WAIST OF API KEY!!!
+        # FALSE = WILL ONLY CHECK GIVEN SERVER, TRUE = WILL CHECK ALL SERVERS UNTIL FINDING PLAYER
+
+        notice = "Looking for the latest match of "  # DEFAULT NOTICE SENT to USER!
+
+        # Check that a NAME was GIVEN
+        if player_name == "":
+            await self.bot.say("You need to give a players name... :sweat_smile:")
+            return
+
+        # Check that NAME is VALID
+        if tools.isIntTOOL(player_name) == True or len(player_name) < 3:
+            await self.bot.say(str(player_name) + " isn't a valid name!")
+
+        notice += str(player_name)
+
+        # Check that SERVER is VALID
+        if server == "na" or server == "eu" or server == "sg" or server == "ea" or server == "sa":
+            notice += " in " + str(server) + " servers"
+
+        else:
+            await self.bot.say(str(server) + " isn't a valid server name... :sweat_smile:")
+            return
+
+        # Check that GAMETYPE is VALID
+        if game_type != "" and tools.isIntTOOL(game_type) == False:
+
+            if game_type == "any" or game_type == "casual" or game_type == "rank" or game_type == "royal" or game_type == "blitz":  # GAMETYPE is VALID
+                notice += " from " + game_type + " games"
+
+                # If GAMETYPE is ANY turn to BLANK
+                if game_type == "any":
+                    game_type = ""
+
+            else:  # GAMETYPE isn't VALID
+                await self.bot.say("Sorry but " + str(game_type) + " isn't a valid game type... :sweat_smile:")
+                return
+
+            # Converts AUTO to it's proper BOOLEAN
+            if auto == "False" or auto == "false":
+                auto = False
+            elif auto == "True" or auto == "true":
+                auto = True
+                notice += " - AUTO: True"
+
+            else:
+                await self.bot.say("That isn't a valid secret!")
+                return
+
+            notice += "... :eyes:"
+
+            msg = await self.bot.say(notice)
+            await self.bot.edit_message(msg, embed=getLatestMatchVG(player_name, server, game_type, auto))
+
+def setup(bot):
+    bot.add_cog(Vg(bot))
