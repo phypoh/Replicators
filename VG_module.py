@@ -8,9 +8,10 @@ import datetime
 import discord
 from discord.ext import commands
 import TOOL_module as tools
+from config_secrets import secrets
 
 # VG Variables--
-keyVG = ""  # VG_API_TOKEN_HERE
+keyVG = secrets['VGAPI']  # VG_API_TOKEN_HERE
 apiVG = gamelocker.Gamelocker(keyVG).Vainglory()  # API OBJECT
 
 # DISCORD EMBED VARIABLES--
@@ -1051,6 +1052,7 @@ class Vg():
 
                 >stats (player_name) (server) (days) (game_type)
             player_name   ~   name of player to search for
+
             server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sg, ea, sa
             days          ~   day range to search from                     ~   default: 7, requirements: maximum: 93, minimum: 1
             game_type     ~   game type you would like performance check   ~   default: any, options: any, casual, ranked, royal, blitz
@@ -1147,6 +1149,7 @@ class Vg():
 
     @commands.command()
     async def player(self, player_name="", server="na", mode="user", auto="False"):
+
         """Checks if player exist in vainglory.
 
                 >player (player_name) (mode)
@@ -1155,8 +1158,12 @@ class Vg():
             mode          ~   user or dev mode                             ~   default: user, options: user, dev
 
             Example:
+<<<<<<< HEAD
                 >player player1 na user
 
+=======
+                >player player1 na casual
+>>>>>>> origin/master
         """
 
         # AUTO IS A SECRET VARIABLE THAT MAKES COMPUTER CHECK EVERY SERVER FOR PLAYER !!!WAIST OF API KEY!!!
