@@ -9,15 +9,14 @@ import discord
 from discord.ext import commands
 import TOOL_module as tools
 
-from config_secrets import secrets
 import dateutil.parser
 
+
 from VG_functions import getPlayerInfoVG, getPlayerPerformanceVG, getLatestMatchVG
-from VG_toolbox import giveKarmaVG, giveMatchVG, giveSkillTierVG
+from VG_toolbox import giveKarmaVG, giveMatchVG, giveSkillTierVG, giveGameModeVG, giveServerList
 
 
 # VG Variables--
-keyVG = ""  # VG_API_TOKEN_HERE
 apiVG = gamelocker.Gamelocker(keyVG).Vainglory()  # API OBJECT
 
 # DISCORD EMBED VARIABLES--
@@ -49,7 +48,6 @@ class Vg():
                 >stats player1 na 10 casual
 
         """
-
         # AUTO IS A SECRET VARIABLE THAT MAKES COMPUTER CHECK EVERY SERVER FOR PLAYER !!!WASTE OF API KEY!!!
         # FALSE = WILL ONLY CHECK GIVEN SERVER, TRUE = WILL CHECK ALL SERVERS UNTIL FINDING PLAYER
 
@@ -71,7 +69,7 @@ class Vg():
         notice = "Looking at matches for " + str(player_name)
 
         # Check that SERVER is VALID
-        if server == "na" or server == "eu" or server == "sg" or server == "ea" or server == "sa":
+        if server in giveServerList:
             notice += " in " + str(server) + " servers"
 
         else:
@@ -100,7 +98,7 @@ class Vg():
         # Check that GAMETYPE is VALID
         if game_type != "" and tools.isIntTOOL(game_type) == False:
 
-            if game_type == "any" or game_type == "casual" or game_type == "rank" or game_type == "royal" or game_type == "blitz":  # GAMETYPE is VALID
+            if game_type in giveGameModeVG():  # GAMETYPE is VALID
                 notice += " from " + game_type + " games"
 
                 # If GAMETYPE is ANY turn to BLANK
@@ -133,7 +131,12 @@ class Vg():
         # NOTICE USER that THEIR COMMAND is being PROCESSED
         msg = await self.bot.say(notice)
         # RUNS PERFORMANCE FETCH and UPDATES MESSAGE once DONE
-        await self.bot.edit_message(msg, embed=getPlayerPerformanceVG(player_name, server, days, game_type, auto))
+        
+        output = getPlayerPerformanceVG(player_name, server, days, game_type, auto)
+        if type(output) == str:
+                await self.bot.edit_message(msg, output)
+        else:
+            await self.bot.edit_message(msg, embed=output)
 
     @commands.command()
     async def player(self, player_name="", server="na", mode="user", auto="False"):
@@ -166,7 +169,7 @@ class Vg():
         notice += str(player_name)
 
         # Check that SERVER is VALID
-        if server == "na" or server == "eu" or server == "sg" or server == "ea" or server == "sa":
+        if server in giveServerList:
             notice += " in " + str(server) + " servers"
 
         else:
@@ -200,7 +203,11 @@ class Vg():
         player_name = str(player_name)  # Convert PLAYER_NAME to STRING to prevent errors
 
         msg = await self.bot.say(notice)  # NOTICE USER that THEIR COMMAND is being PROCESSED
-        await self.bot.edit_message(msg, embed=getPlayerInfoVG(player_name, server, mode, auto))  # RUNS ID TEST
+        output = getPlayerInfoVG(player_name, server, mode, auto)
+        if type(output) == str:
+                await self.bot.edit_message(msg, output)
+        else:
+            await self.bot.edit_message(msg, embed=output)  # RUNS ID TEST
 
 
     @commands.command()
@@ -234,7 +241,7 @@ class Vg():
         notice += str(player_name)
 
         # Check that SERVER is VALID
-        if server == "na" or server == "eu" or server == "sg" or server == "ea" or server == "sa":
+        if server in giveServerList:
             notice += " in " + str(server) + " servers"
 
         else:
@@ -244,7 +251,7 @@ class Vg():
         # Check that GAMETYPE is VALID
         if game_type != "" and tools.isIntTOOL(game_type) == False:
 
-            if game_type == "any" or game_type == "casual" or game_type == "rank" or game_type == "royal" or game_type == "blitz":  # GAMETYPE is VALID
+            if game_type in giveGameModeVG():  # GAMETYPE is VALID
                 notice += " from " + game_type + " games"
 
                 # If GAMETYPE is ANY turn to BLANK
@@ -269,7 +276,11 @@ class Vg():
             notice += "... :eyes:"
 
             msg = await self.bot.say(notice)
-            await self.bot.edit_message(msg, embed=getLatestMatchVG(player_name, server, game_type, auto))
+            output = getLatestMatchVG(player_name, server, game_type, auto)
+            if type(output) == str:
+                await self.bot.edit_message(msg, output)
+            else:
+                await self.bot.edit_message(msg, embed=getLatestMatchVG(player_name, server, game_type, auto))
 
 def setup(bot):
     bot.add_cog(Vg(bot))

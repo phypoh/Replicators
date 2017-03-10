@@ -4,6 +4,8 @@ List of functions in this script:
     giveKarmaVG(karma, mode=0)
     giveMatchVG(match, mode=0)
     giveSkillTierVG(tier, mode=0)
+    giveGameModeVG
+    giveServerList
 
 """
 
@@ -49,8 +51,8 @@ def giveMatchVG(match, mode=0):
     try:
         return match_dict[match]
     except:
-        return match
-
+        return match     
+        
 # Gives SKILL TIER as a TITLE
 def giveSkillTierVG(tier, mode=0):
     if tools.isIntTOOL(tier) == False:
@@ -93,4 +95,14 @@ def giveSkillTierVG(tier, mode=0):
 
     return skill_dict[tier][mode]
 
+giveGameModeVG= [
+    "any",
+    "casual",
+    "ranked",
+    "blitz",
+    "royal"] 
+    return gameMode_list   
+    
+giveServerList = ["na", "eu", "sg", "ea", "sa"]
 
+    
