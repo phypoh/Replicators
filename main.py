@@ -66,7 +66,7 @@ async def owner(ctx):
 
 @bot.event
 async def on_ready():
-    await client.change_presence(game=discord.Game(name='$help'))
+    await bot.change_presence(game=discord.Game(name='$help'))
     
 @owner.command(pass_context=True)
 async def load(ctx, module: str):
