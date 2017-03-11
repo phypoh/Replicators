@@ -111,7 +111,7 @@ def getPlayerInfoVG(name, server="", mode="", auto=False):
                     karmaLevel = str(matchstats["karmaLevel"])
 
     # CREATES the STRING for ID
-    idString = "\n**ID:** *" + str(id) + "*"
+    idString = "\n**ID:** *" + str(IGN) + "*"
 
     # CREATES the STRING for LIFETIMEGOLD
     lifetimeGoldString = "\n**Life Time Gold:** *" + str(lifetimeGold) + "*"
