@@ -71,6 +71,7 @@ class Vg():
 
         if tools.isIntTOOL(server) == True:
             await self.bot.say(str(server) + " isn't a valid server name... :sweat_smile:")
+            return
 
         server = str(server.lower())
 
