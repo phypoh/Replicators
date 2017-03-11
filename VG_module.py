@@ -14,16 +14,12 @@ from gamelocker.strings import pretty
 import datetime
 import discord
 import TOOL_module as tools
-
 import dateutil.parser
-
 import VG_toolbox
-
-from VG_functions import getPlayerInfoVG, getPlayerPerformanceVG, getLatestMatchVG
-from VG_toolbox import giveKarmaVG, giveMatchVG, giveSkillTierVG, giveGameModeVG, giveServerList
 
 
 # VG Variables--
+keyVG = ""  # API key for Vainglory
 apiVG = gamelocker.Gamelocker(keyVG).Vainglory()  # API OBJECT
 
 # DISCORD EMBED VARIABLES--
