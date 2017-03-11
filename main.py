@@ -7,7 +7,7 @@ descriptionBOT = "EZLBot is a bot created for Discord to utilize the VG api!"
 
 bot = commands.Bot(command_prefix='$', description=descriptionBOT)
 
-OWNERS = ['198255568882761728', '164026892796690433', '102704301956149248', '139537219793715200']
+OWNER = ['198255568882761728', '164026892796690433', '102704301956149248', '139537219793715200']
 serverprefix = {}
 
 #loads serverprefix dict from pickle file
@@ -25,7 +25,7 @@ def storePrefix():
 #Checks for server prefix
 @bot.event
 async def on_message(message):
-    pr = serverprefix.get(message.server.id, bot.command_prefix[0])
+    pr = serverprefix.get(message.server.id, '$')
     bot.command_prefix = [pr]
     await bot.process_commands(message)
 
@@ -39,6 +39,14 @@ async def on_server_remove(server):
     serverprefix.pop(server.id, None)
     storePrefix()
 #Used to change the prefix
+
+@bot.command(pass_context=True)
+async def specialannouncement(ctx, *,msg:str)
+    if ctx.message.author.id not in OWNER:
+        return
+    for i in bot.servers:
+        await bot.send_message(i.default_channel, msg)
+        
 @bot.command(pass_context=True)
 async def prefix(ctx, prefix: str):
     """
@@ -61,21 +69,21 @@ async def on_ready():
     await client.change_presence(game=discord.Game(name='$help'))
     
 @owner.command(pass_context=True)
-async def load(ctx, module: str)
+async def load(ctx, module: str):
     if ctx.message.author.id not in OWNER:
         return
     bot.load_extension(module)
     await bot.say("K")
 
 @owner.command(pass_context=True)
-async def unload(ctx, module: str)
+async def unload(ctx, module: str):
     if ctx.message.author.id not in OWNER:
         return
     bot.unload_extension(module)
     await bot.say("K")
 
 @owner.command(pass_context = True)
-async def reload(ctx, module: str)
+async def reload(ctx, module: str):
     if ctx.message.author.id not in OWNER:
         return
     bot.unload_extension(module)
