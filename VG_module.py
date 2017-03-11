@@ -52,7 +52,8 @@ def getPlayerInfoVG(name, server="", mode="", auto=False):
             "eu",
             "sg",
             "ea",
-            "sa"
+            "sa",
+            "tournament-na"
         ]
 
         for serverTry in servers:
@@ -206,7 +207,8 @@ def getPlayerPerformanceVG(name, server="", game="", days=7, auto=False):
             "eu",
             "sg",
             "ea",
-            "sa"
+            "sa",
+            "tournament-na"
         ]
 
         for serverTry in servers:
@@ -516,7 +518,8 @@ def getLatestMatchVG(name, server, game, auto):
             "eu",
             "sg",
             "ea",
-            "sa"
+            "sa",
+            "tournament-na"
         ]
 
         for serverTry in servers:
