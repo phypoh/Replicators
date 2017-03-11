@@ -57,6 +57,7 @@ def giveMatchVG(match, mode=0):
     except:
         return match
 
+      
 # Gives SKILL TIER as a TITLE
 def giveSkillTierVG(tier, mode=0):
     if tools.isIntTOOL(tier) == False:
@@ -145,3 +146,4 @@ def isServerVG(server, type=0):
 
     else:
         return False
+      

@@ -10,7 +10,7 @@ import VG_commands
 keyBOT = ""  # DISCORD_BOT_TOKEN_HERE
 extensionsForBOT = ["BOT_commands", "VG_commands"]  # MODULES that EXTEND the BOTS COMMANDS ~ !!!ADD YOUR MODULE TO THIS LIST IF YOU WANT TO EXTEND COMMANDS!!!
 descriptionBOT = "Computer is a bot created for Discord to utilize the VG api!"  # DESCRIPTION of the BOT
-bot = commands.Bot(command_prefix=">", description=descriptionBOT)  # CREATE the BOT
+bot = commands.Bot(command_prefix="!", description=descriptionBOT)  # CREATE the BOT
 
 
 # Whenever BOT is READY
