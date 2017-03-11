@@ -27,12 +27,18 @@ class Bot():
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()  # pass_context=True
-    async def developer(self, command=""):
+    @commands.command(pass_context=True)
+    async def developer(self,message, command=""):
         """A command used by developers."""
 
         # author = msg.message.author  # Get the AUTHOR of the MESSAGE
         # channel = msg.message.channel  # Get the CHANNEL of the MESSAGE
+        id = str(message.message.author.id)
+        print(id)
+        if id == "198255568882761728" or id == "164026892796690433" or id == "102704301956149248" or id == "139537219793715200":
+            pass
+        else:
+            await self.bot.say("You aren't a developer! :stuck_out_tongue_closed_eyes:")
 
         if command == "":
             await self.bot.say("You need to input an extension command... :sweat_smile:")
