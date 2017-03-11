@@ -75,7 +75,7 @@ def getPlayerInfoVG(name, server="", mode="", auto=False):
         return "!!!HUGE ERROR!!!"
 
     # MATCH VARIABLES
-    id = ""
+    IGN = ""
     level = ""
     lifetimeGold = ""
     lossStreak = ""
@@ -97,7 +97,7 @@ def getPlayerInfoVG(name, server="", mode="", auto=False):
                     matchstats = participant.stats
                     playerstats = participant.player.stats
 
-                    id = str(participant.player.id)
+                    IGN = str(participant.player.id)
                     level = str(matchstats["level"])
                     lifetimeGold = str(playerstats["lifetimeGold"])
                     lossStreak = str(playerstats["lossStreak"])
