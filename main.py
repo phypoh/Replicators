@@ -25,7 +25,7 @@ def storePrefix():
 #Checks for server prefix
 @bot.event
 async def on_message(message):
-    pr = serverprefix.get(message.server.id, bot.command_prefix[0])
+    pr = serverprefix.get(message.server.id, '$')
     bot.command_prefix = [pr]
     await bot.process_commands(message)
 
@@ -61,21 +61,21 @@ async def on_ready():
     await client.change_presence(game=discord.Game(name='$help'))
     
 @owner.command(pass_context=True)
-async def load(ctx, module: str)
+async def load(ctx, module: str):
     if ctx.message.author.id not in OWNER:
         return
     bot.load_extension(module)
     await bot.say("K")
 
 @owner.command(pass_context=True)
-async def unload(ctx, module: str)
+async def unload(ctx, module: str):
     if ctx.message.author.id not in OWNER:
         return
     bot.unload_extension(module)
     await bot.say("K")
 
 @owner.command(pass_context = True)
-async def reload(ctx, module: str)
+async def reload(ctx, module: str):
     if ctx.message.author.id not in OWNER:
         return
     bot.unload_extension(module)
