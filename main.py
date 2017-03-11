@@ -41,7 +41,7 @@ async def on_server_remove(server):
 #Used to change the prefix
 
 @bot.command(pass_context=True)
-async def specialannouncement(ctx, *,msg:str)
+async def specialannouncement(ctx, *,msg:str):
     if ctx.message.author.id not in OWNER:
         return
     for i in bot.servers:
@@ -97,5 +97,5 @@ if __name__ == "__main__":
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)
             print('Failed to load extension {}\n{}'.format(extension, exc))
-
+    
     bot.run(keyBot)
