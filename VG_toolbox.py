@@ -35,10 +35,6 @@ def giveKarmaVG(karma, mode=0):
 
 # GIVES the IGN for MATCH MODE
 def giveMatchVG(match, mode=0):
-    # Check that MATCH is VALID
-    if tools.isIntTOOL(match) == True:
-        return "That one match..."
-
     match = str(match)  # Convert MATCH to STRING to prevent ERRORS
     
     match_dict = {
@@ -50,12 +46,24 @@ def giveMatchVG(match, mode=0):
      "private_party_aral_match":"Private Battle Royal",
      "casual": "Casual Match",
      "ranked": "Rank Match"}
-
-    try:
-        return match_dict[match]
-
-    except:
-        return match
+     
+    reverse_match = {
+    "blitz": "blitz_pvp_ranked",
+    "royal": "casual_aral",
+    "rank": "ranked"    
+    }
+    if mode == 0:
+        try:
+            return match_dict[match]
+    
+        except:
+            return match
+    elif mode == 1:
+        try:
+            return reverse_match[match]
+    
+        except:
+            return match
 
       
 # Gives SKILL TIER as a TITLE
@@ -125,9 +133,7 @@ def isGameModeVG(mode, type=0):
         return False
 
 # Will check that SERVER is VALID
-def isServerVG(server, type=0):
-    if tools.isIntTOOL(server) == True:
-        return False
+def isServerVG(server):
 
     server = str(server)  # Convert SERVER to STRING to prevent ERRORS
 
