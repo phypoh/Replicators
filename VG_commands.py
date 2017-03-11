@@ -69,6 +69,11 @@ class Vg():
 
         notice = "Looking at matches for " + str(player_name)
 
+        if tools.isIntTOOL(server) == True:
+            await self.bot.say(str(server) + " isn't a valid server name... :sweat_smile:")
+
+        server = str(server.lower())
+
         # Check that SERVER is VALID
         if VG_toolbox.isServerVG(server) == True:
             if str(server) == "sea":
@@ -172,10 +177,16 @@ class Vg():
 
         notice += str(player_name)
 
+        if tools.isIntTOOL(server) == True:
+            await self.bot.say(str(server) + " isn't a valid server name... :sweat_smile:")
+
+        server = str(server.lower())
+
         # Check that SERVER is VALID
         if VG_toolbox.isServerVG(server) == True:
             if str(server) == "sea":
                 server = "sg"
+
             notice += " in " + str(server) + " servers"
 
         else:
@@ -245,6 +256,11 @@ class Vg():
             await self.bot.say(str(player_name) + " isn't a valid name!")
 
         notice += str(player_name)
+        
+        if tools.isIntTOOL(server) == True:
+            await self.bot.say(str(server) + " isn't a valid server name... :sweat_smile:")
+
+        server = str(server.lower())
 
         # Check that SERVER is VALID
         if VG_toolbox.isServerVG(server) == True:
