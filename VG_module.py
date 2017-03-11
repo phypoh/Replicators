@@ -75,7 +75,7 @@ def getPlayerInfoVG(name, server="", mode="", auto=False):
         return "!!!HUGE ERROR!!!"
 
     # MATCH VARIABLES
-    id = ""
+    IGN = ""
     level = ""
     lifetimeGold = ""
     lossStreak = ""
@@ -97,7 +97,7 @@ def getPlayerInfoVG(name, server="", mode="", auto=False):
                     matchstats = participant.stats
                     playerstats = participant.player.stats
 
-                    id = str(participant.player.id)
+                    IGN = str(participant.player.id)
                     level = str(matchstats["level"])
                     lifetimeGold = str(playerstats["lifetimeGold"])
                     lossStreak = str(playerstats["lossStreak"])
@@ -111,7 +111,7 @@ def getPlayerInfoVG(name, server="", mode="", auto=False):
                     karmaLevel = str(matchstats["karmaLevel"])
 
     # CREATES the STRING for ID
-    idString = "\n**ID:** *" + str(id) + "*"
+    idString = "\n**ID:** *" + str(IGN) + "*"
 
     # CREATES the STRING for LIFETIMEGOLD
     lifetimeGoldString = "\n**Life Time Gold:** *" + str(lifetimeGold) + "*"
@@ -179,7 +179,7 @@ def getPlayerInfoVG(name, server="", mode="", auto=False):
 
 
 # Get a PLAYERS performance from RANGE of DAYS with the players NAME
-def getPlayerPerformanceVG(name, server="", days=7, game="", auto=False):
+def getPlayerPerformanceVG(name, server="", game="", days=7, auto=False):
     name = str(name)  # Convert NAME to STRING to prevent errors
     server = str(server)  # Convert SERVER to STRING to prevent errors
     days = int(days)  # Convert DAYS to INT to prevent errors

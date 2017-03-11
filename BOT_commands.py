@@ -63,7 +63,7 @@ class Bot():
     async def invite(self):
         """When you want to invite this bot to another server."""
 
-        await self.bot.say("You can invite me to any server at:\nhttp://bit.ly/EZLBot")
+        await self.bot.say("You can invite me to any server at:\nhttp://ezlgg.com/bot")
 
     @commands.command()
     async def bot(self):
