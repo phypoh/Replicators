@@ -17,8 +17,7 @@ you should really be learning from the Vainglory API docs, https://developer.vai
 
     We're working towards the following features:
         1) Twitch Features
-                Manage Twitch from within Discord and features such as notifying servers, channels, players, etc.
-            who are subscribed to you about just everything
+                Manage Twitch from within Discord and features such as notifying servers, channels, players, etc. who are subscribed to you about just everything
 
         2) Tournament Features
             Create, manage, find, and join tournaments, of any kind, from within Discord
