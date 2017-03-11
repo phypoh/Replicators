@@ -160,8 +160,7 @@ def getPlayerInfoVG(name, server="", mode="", auto=False):
                           timestamp=datetime.datetime.now())
 
     # Set the HEADER
-    embed.set_author(name="Computer", url="https://github.com/ClarkThyLord/Computer-BOT",
-                     icon_url="http://i67.tinypic.com/25738l1.jpg")
+    embed.set_author(name="Halcyon Hackers", url="https://github.com/ClarkThyLord/Computer-BOT", icon_url="http://i67.tinypic.com/25738l1.jpg")
 
     # Set the THUMBNAIL to MOST USED HERO
     try:
@@ -489,7 +488,7 @@ def getPlayerPerformanceVG(name, server="", days=7, game="", auto=False):
     embed = discord.Embed(title=title, colour=discord.Colour(0x4e9ff9), description=description, timestamp=datetime.datetime.now())
 
     # Set the HEADER
-    embed.set_author(name="Computer", url="https://github.com/ClarkThyLord/Computer-BOT", icon_url="http://i67.tinypic.com/25738l1.jpg")
+    embed.set_author(name="Halcyon Hackers", url="https://github.com/ClarkThyLord/Computer-BOT", icon_url="http://i67.tinypic.com/25738l1.jpg")
 
     # Set the THUMBNAIL to MOST USED HERO
     try:
@@ -764,7 +763,7 @@ def getLatestMatchVG(name, server, game, auto):
     embed = discord.Embed(title=title, colour=discord.Colour(0x4e9ff9), description=description, timestamp=datetime.datetime.now())
 
     # Set the HEADER
-    embed.set_author(name="Computer", url="https://github.com/ClarkThyLord/Computer-BOT", icon_url="http://i67.tinypic.com/25738l1.jpg")
+    embed.set_author(name="Halcyon Hackers", url="https://github.com/ClarkThyLord/Computer-BOT", icon_url="http://i67.tinypic.com/25738l1.jpg")
 
     # Set the THUMBNAIL to MOST USED HERO
     try:
