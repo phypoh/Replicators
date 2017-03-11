@@ -16,10 +16,11 @@ import discord
 import TOOL_module as tools
 import dateutil.parser
 import VG_toolbox
+from VG_toolbox import giveMatchVG
 
 
 # VG Variables--
-keyVG = ""  # API key for Vainglory
+keyVG = KEYGOESHERE
 apiVG = gamelocker.Gamelocker(keyVG).Vainglory()  # API OBJECT
 
 # DISCORD EMBED VARIABLES--
@@ -41,12 +42,9 @@ def getPlayerInfoVG(name, server="", mode="", auto=False):
     datenow = datetime.date.today()
     daterange = str(datenow - datetime.timedelta(days=31)) + "T00:00:00Z"  # Get the DATE RANGE to SEARCH from
     datenow = str(datetime.date.today()) + "T00:00:00Z"  # CURRENT DATE
-
-    filterVG = {'filter[createdAt-start]': daterange, 'page[limit]': 1, 'filter[playerNames]': name, "sort": "-createdAt"}  # DEFAULT things to FILTER VG PLAYERS BY
-
-    # FOR DEBUGGING
-    # print(filterVG)
-
+    
+    filterVG = {'filter[createdAt-start]': daterange, 'page[limit]': 1, 'filter[playerNames]': name, "sort": "-createdAt"}          
+        
     if auto == True:
 
         servers = [
@@ -195,17 +193,8 @@ def getPlayerPerformanceVG(name, server="", days=7, game="", auto=False):
 
     filterVG = {"filter[createdAt-start]": daterange, "page[limit]": 50, "filter[playerNames]": name, "sort": "-createdAt"}  # DEFAULT things to FILTER VG MATCHES BY
 
-    if game == "casual":
-        filterVG["filter[gameMode]"] = "casual"
-
-    elif game == "rank":
-        filterVG["filter[gameMode]"] = "ranked"
-
-    elif game == "royale":
-        filterVG["filter[gameMode]"] = "casual_aral"
-
-    elif game == "blitz":
-        filterVG["filter[gameMode]"] = "blitz_pvp_ranked"
+    if game != "any":
+        filterVG["filter[gameMode]"] = giveMatchVG(game, 1)
 
     # FOR DEBUGGING
     # print(filterVG)
@@ -517,21 +506,8 @@ def getLatestMatchVG(name, server, game, auto):
 
     filterVG = {'filter[createdAt-start]': daterange, 'page[limit]': 1, 'filter[playerNames]': name, "sort": "-createdAt"}  # DEFAULT things to FILTER VG PLAYERS BY
 
-    if game == "casual":
-        filterVG["filter[gameMode]"] = "casual"
-
-    elif game == "rank":
-        filterVG["filter[gameMode]"] = "ranked"
-
-    elif game == "royal":
-        filterVG["filter[gameMode]"] = "casual_aral"
-
-    elif game == "blitz":
-        filterVG["filter[gameMode]"] = "blitz_pvp_ranked"
-
-
-    # FOR DEBUGGING
-    # print(filterVG)
+    if game != "any":
+        filterVG["filter[gameMode]"] = giveMatchVG(game, 1)
 
     if auto == True:
 
