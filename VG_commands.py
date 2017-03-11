@@ -36,17 +36,17 @@ class Vg():
         self.bot = bot
 
     @commands.command()
-    async def stats(self, player_name="", server="na", days="7", game_type="any", auto="False"):
+    async def stats(self, player_name="", server="na", game_type="any", days="7", auto="False"):
         """Gets a players performance in the past days.
 
-                >stats (player_name) (server) (days) (game_type)
+                >stats (player_name) (server) (game_type) (days)
             player_name   ~   name of player to search for
             server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sea or sg, ea, sa
-            days          ~   day range to search from                     ~   default: 7, requirements: maximum: 93, minimum: 1
             game_type     ~   game type you would like performance check   ~   default: any, options: any, casual, ranked, royale, blitz
-
+            days          ~   day range to search from                     ~   default: 7, requirements: maximum: 93, minimum: 1
+            
             example:
-                >stats player1 na 10 casual
+                >stats player1 na casual 10
 
         """
         # AUTO IS A SECRET VARIABLE THAT MAKES COMPUTER CHECK EVERY SERVER FOR PLAYER !!!WASTE OF API KEY!!!
@@ -142,7 +142,7 @@ class Vg():
         msg = await self.bot.say(notice)
         # RUNS PERFORMANCE FETCH and UPDATES MESSAGE once DONE
         
-        output = VG_module.getPlayerPerformanceVG(player_name, server, days, game_type, auto)
+        output = VG_module.getPlayerPerformanceVG(player_name, server, game_type, days, auto)
         if type(output) == str:
                 await self.bot.edit_message(msg, output)
         else:
@@ -305,7 +305,6 @@ class Vg():
             output = VG_module.getLatestMatchVG(player_name, server, game_type, auto)
             if type(output) == str:
                 await self.bot.edit_message(msg, output)
-
             else:
                 await self.bot.edit_message(msg, embed=output)
 

@@ -179,7 +179,7 @@ def getPlayerInfoVG(name, server="", mode="", auto=False):
 
 
 # Get a PLAYERS performance from RANGE of DAYS with the players NAME
-def getPlayerPerformanceVG(name, server="", days=7, game="", auto=False):
+def getPlayerPerformanceVG(name, server="", game="", days=7, auto=False):
     name = str(name)  # Convert NAME to STRING to prevent errors
     server = str(server)  # Convert SERVER to STRING to prevent errors
     days = int(days)  # Convert DAYS to INT to prevent errors
