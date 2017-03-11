@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import pickle
 
+keyBot = ""
 startup_extensions = ["BOT_commands", 'VG_commands']
 descriptionBOT = "EZLBot is a bot created for Discord to utilize the VG api!"
 
@@ -41,7 +42,7 @@ async def on_server_remove(server):
 #Used to change the prefix
 
 @bot.command(pass_context=True)
-async def specialannouncement(ctx, *,msg:str):
+async def specialannouncement(ctx, *, msg: str):
     if ctx.message.author.id not in OWNER:
         return
     for i in bot.servers:
