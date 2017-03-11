@@ -256,7 +256,7 @@ class Vg():
             await self.bot.say(str(player_name) + " isn't a valid name!")
 
         notice += str(player_name)
-        
+
         if tools.isIntTOOL(server) == True:
             await self.bot.say(str(server) + " isn't a valid server name... :sweat_smile:")
 

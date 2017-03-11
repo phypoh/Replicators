@@ -56,7 +56,7 @@ class Bot():
     async def invite(self):
         """When you want to invite this bot to another server."""
 
-        await self.bot.say("You can invite me to any server at:\nhttps://discordapp.com/oauth2/authorize?client_id=284430926648442890&scope=bot&permissions=0x00004000")
+        await self.bot.say("You can invite me to any server at:\nhttp://bit.ly/EZLBot")
 
     @commands.command()
     async def bot(self):
