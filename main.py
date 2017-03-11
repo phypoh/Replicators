@@ -7,7 +7,7 @@ descriptionBOT = "EZLBot is a bot created for Discord to utilize the VG api!"
 
 bot = commands.Bot(command_prefix='$', description=descriptionBOT)
 
-OWNERS = ['198255568882761728', '164026892796690433', '102704301956149248', '139537219793715200']
+OWNER = ['198255568882761728', '164026892796690433', '102704301956149248', '139537219793715200']
 serverprefix = {}
 
 #loads serverprefix dict from pickle file
