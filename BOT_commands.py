@@ -39,6 +39,7 @@ class Bot():
             pass
         else:
             await self.bot.say("You aren't a developer! :stuck_out_tongue_closed_eyes:")
+            return
 
         if command == "":
             await self.bot.say("You need to input an extension command... :sweat_smile:")
