@@ -39,6 +39,14 @@ async def on_server_remove(server):
     serverprefix.pop(server.id, None)
     storePrefix()
 #Used to change the prefix
+
+@bot.command(pass_context=True)
+async def specialannouncement(ctx, *,msg:str)
+    if ctx.message.author.id not in OWNER:
+        return
+    for i in bot.servers:
+        await bot.send_message(i.default_channel, msg)
+        
 @bot.command(pass_context=True)
 async def prefix(ctx, prefix: str):
     """
