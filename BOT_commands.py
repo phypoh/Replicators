@@ -14,7 +14,7 @@ import discord
 from discord.ext import commands
 
 # BOT VARIABLES
-nameBOT = "Computer"
+nameBOT = "EZLBot"
 
 # CLASS containing ALL COMMANDS for THIS MODULE
 class Bot():
