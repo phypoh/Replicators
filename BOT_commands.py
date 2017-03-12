@@ -64,11 +64,11 @@ class Bot():
             notice = "I'm in **" + str(len(self.bot.servers)) + "** servers total!\nNames are the Following:\n"
 
             for server in self.bot.servers:
-                notice += str(server.name)
+                notice += str(server.name) + ", "
 
             await self.bot.edit_message(msg, notice)
 
-        if command == "notice":
+        elif command == "notice":
             msg = raw.message.content
             msg = msg.split("notice")
 
@@ -95,32 +95,6 @@ class Bot():
 
         await self.bot.say("Hi, I'm *" + str(nameBOT) + "*, and I've been developed in Python and have grown with lots of love. You can see a list of our commands with the **help** command!")
 
-    # STORE PREFIXES into SERVERPREFIXES
-    # def storePrefix():
-    #     # Store data (serialize)
-    #     with open('prefixes.pickle', 'wb') as handle:
-    #         pickle.dump(serverprefixes, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-    # Used to CHANGE the PREFIX
-    @commands.command(pass_context=True)
-    async def prefix(self, raw, prefix=""):
-        """Used to change server's prefix."""
-
-        prefix = str(prefix)  # CONVERT PREFIX to STRING to prevent ERRORS
-
-        if prefix == "":
-            await self.bot.say("You need to give a **prefix**... :sweat_smile:")
-            return
-
-        if not raw.message.author.permissions_in(raw.message.channel).administrator:
-            await self.bot.say('Sorry, but you have to be an **admin** to change the prefix.')
-            return
-
-        main.serverprefixes[raw.message.server.id] = prefix
-        # list = [raw.message.server.id, prefix]
-
-        await self.bot.say("**prefixed changed to " + str(prefix) + "**\nPlease don't forget your new prefix.\nWant me good as new? Just kick me out of the server and reinvite me.")
-        main.storePrefix()
 
 def setup(bot):
     bot.add_cog(Bot(bot))
