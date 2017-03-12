@@ -8,84 +8,114 @@ descriptionBOT = "EZLBot is a bot created for Discord to utilize the VG api!"
 
 bot = commands.Bot(command_prefix='$', description=descriptionBOT)
 
-OWNER = ['198255568882761728', '164026892796690433', '102704301956149248', '139537219793715200']
-serverprefix = {}
+OWNERS = ['198255568882761728', '164026892796690433', '102704301956149248', '139537219793715200']  # When you want to AUTHENTICATE the AUTHOR
+serverprefixes = {}  # DICTIONARY of all SERVERS PREFIX
 
-#loads serverprefix dict from pickle file
+# Loads serverprefixes dict from the pickle file
 try:
     with open('prefixes.pickle', 'rb') as handle:
-        serverprefix = pickle.load(handle)
+        serverprefixes = pickle.load(handle)
+
+    # FOR DEBUGGING
+    print(str(serverprefixes) + "   |   LOADED PREFIXES")
+
 except:
-    print('No Prefixes Yet')
+    print("No Prefixes Yet")
 
-def storePrefix():
-    # Store data (serialize)
-    with open('prefixes.pickle', 'wb') as handle:
-        pickle.dump(serverprefix, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# Do when the BOT is ready to RUN
+@bot.event
+async def on_ready():
+    print('Logged In As: ' + bot.user.name + "  ID:  " + bot.user.id + "\n\n")  # PRINT the IDENTIFIERS of the BOT
+    await bot.change_presence(game=discord.Game(name='$help'))
 
-#Checks for server prefix
+
+# CHECK for server PREFIX
 @bot.event
 async def on_message(message):
-    pr = serverprefix.get(message.server.id, '$')
+    # FOR DEBUGGING
+    # print(str(serverprefixes) + "   |   REAL TIME PREFIXES")
+
+    pr = serverprefixes.get(message.server.id, '$')
     bot.command_prefix = [pr]
     await bot.process_commands(message)
 
-@bot.event
-async def on_server_join(server):
-    await bot.send_message(server.default_channel, 'Hey! Thanks for the invite <3 Use {}help to get started'.format(bot.command_prefix[0]))
+# Used to CHANGE the PREFIX
+@bot.command(pass_context=True)
+async def prefix(raw, prefix=""):
+    """Used to change server's prefix.
 
-#Removes prefix on server removal
+            >prefix (new_prefix)
+
+        new_prefix   ~   Any combinations of character that isn't separated with space
+
+        Example:
+            >prefix Ezl1!
+
+    """
+
+    prefix = str(prefix)  # CONVERT PREFIX to STRING to prevent ERRORS
+
+    if prefix == "":
+        await bot.say("You need to give a **prefix**... :sweat_smile:")
+        return
+
+    if not raw.message.author.permissions_in(raw.message.channel).administrator:
+        await bot.say('Sorry, but you have to be an **admin** to change the prefix.')
+        return
+
+    serverprefixes[raw.message.server.id] = prefix
+
+    await bot.say("**prefixed changed to " + str(prefix) + "**\nPlease don't forget your new prefix.\nWant me good as new? Just kick me out of the server and reinvite me.")
+    storePrefix()
+
+
+# STORE PREFIXES into SERVERPREFIXES
+def storePrefix():
+    # Store data (serialize)
+    with open('prefixes.pickle', 'wb') as handle:
+        pickle.dump(serverprefixes, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    # FOR DEBUGGING
+    # print(str(serverprefixes) + "   |   AFTER STORING")
+
+# REMOVES PREFIX ON SERVER REMOVAL
 @bot.event
 async def on_server_remove(server):
-    serverprefix.pop(server.id, None)
-    storePrefix()
-#Used to change the prefix
-
-@bot.command(pass_context=True, hidden=True)
-async def specialannouncement(ctx, *, msg: str):
-    if ctx.message.author.id not in OWNER:
-        return
-    for i in bot.servers:
-        await bot.send_message(i.default_channel, msg)
-        
-@bot.command(pass_context=True)
-async def prefix(ctx, prefix: str):
-    """
-    Used to change server's prefix.
-    """
-    if not ctx.message.author.permissions_in(ctx.message.channel).administrator:
-        await bot.say('Sorry, but you have to be an admin to change the prefix.')
-    serverprefix[ctx.message.server.id] = prefix
-    await bot.say("PREFIX CHANGED to {}".format(prefix))
-    await bot.say("Please don't forget your new prefix. To reset it back to default just kick me out of the server and reinvite me.")
+    serverprefixes.pop(server.id, None)
     storePrefix()
 
+
+    # FOR DEBUGGING
+    # print(serverprefixes)
+
+
+# Group of commands for BOT DEVELOPERS
 @bot.group(pass_context=True, hidden=True)
 async def owner(ctx):
     """ONLY FOR BOT OWNERS"""
     pass
 
-@bot.event
-async def on_ready():
-    await bot.change_presence(game=discord.Game(name='$help'))
-    
 @owner.command(pass_context=True, hidden=True)
-async def load(ctx, module: str):
-    if ctx.message.author.id not in OWNER:
+async def load(raw, module: str):
+    if raw.message.author.id not in OWNERS:
         return
+
     bot.load_extension(module)
     await bot.say("K")
 
+
+
 @owner.command(pass_context=True, hidden=True)
-async def unload(ctx, module: str):
-    if ctx.message.author.id not in OWNER:
+async def unload(raw, module: str):
+    if raw.message.author.id not in OWNERS:
         return
+
     bot.unload_extension(module)
     await bot.say("K")
 
 @owner.command(pass_context = True, hidden=True)
 async def reload(ctx, module: str):
-    if ctx.message.author.id not in OWNER:
+    if ctx.message.author.id not in OWNERS:
         return
     bot.unload_extension(module)
     bot.load_extension(module)

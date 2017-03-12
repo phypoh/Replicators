@@ -16,10 +16,6 @@ import TOOL_module as tools
 import VG_module
 import VG_toolbox
 
-# VG Variables--
-keyVG = KEYGOESHERE  # VG_API_TOKEN_HERE
-apiVG = gamelocker.Gamelocker(keyVG).Vainglory()  # API OBJECT
-
 # DISCORD EMBED VARIABLES--
 botImageDISCORD = "http://i63.tinypic.com/9k6xcj.jpg"  # URL of BOTS IMAGE
 signatureDISCORD = "Big Thanks to SEMC and MadGlory! Made with love ~ xoxo"  # String used in FOOTER as MESSAGE
@@ -106,6 +102,13 @@ class Vg():
             await self.bot.say("Sorry but " + str(days) + " isn't a valid number... :sweat_smile:")  # If DAYS is an INVALID number TELL USER
             return
 
+        # If GAMETYPE is VALID then MESSAGE user
+        if game_type != "" and tools.isIntTOOL(game_type) == True:
+            await self.bot.say("Sorry but " + str(game_type) + " isn't a valid game type... :sweat_smile:")
+            return
+
+        game_type = game_type.lower()
+
         # Check that GAMETYPE is VALID
         if game_type != "" and tools.isIntTOOL(game_type) == False:
 
@@ -119,11 +122,6 @@ class Vg():
             else:  # GAMETYPE isn't VALID
                 await self.bot.say("Sorry but " + str(game_type) + " isn't a valid game type... :sweat_smile:")
                 return
-
-        # If GAMETYPE is VALID then MESSAGE user
-        if game_type != "" and tools.isIntTOOL(game_type) == True:
-            await self.bot.say("Sorry but " + str(game_type) + " isn't a valid game type... :sweat_smile:")
-            return
 
         # END of NOTICE
         notice += "... :eyes:"
@@ -278,6 +276,14 @@ class Vg():
             await self.bot.say(str(server) + " isn't a valid server name... :sweat_smile:")
             return
 
+
+        # If GAMETYPE is VALID then MESSAGE user
+        if game_type != "" and tools.isIntTOOL(game_type) == True:
+            await self.bot.say("Sorry but " + str(game_type) + " isn't a valid game type... :sweat_smile:")
+            return
+
+        game_type = game_type.lower()
+
         # Check that GAMETYPE is VALID
         if game_type != "" and tools.isIntTOOL(game_type) == False:
 
@@ -292,25 +298,25 @@ class Vg():
                 await self.bot.say("Sorry but " + str(game_type) + " isn't a valid game type... :sweat_smile:")
                 return
 
-            # Converts AUTO to it's proper BOOLEAN
-            if auto == "False" or auto == "false":
-                auto = False
-            elif auto == "True" or auto == "true":
-                auto = True
-                notice += " - AUTO: True"
+        # Converts AUTO to it's proper BOOLEAN
+        if auto == "False" or auto == "false":
+            auto = False
+        elif auto == "True" or auto == "true":
+            auto = True
+            notice += " - AUTO: True"
 
-            else:
-                await self.bot.say("That isn't a valid secret!")
-                return
+        else:
+            await self.bot.say("That isn't a valid secret!")
+            return
 
-            notice += "... :eyes:"
+        notice += "... :eyes:"
 
-            msg = await self.bot.say(notice)
-            output = VG_module.getLatestMatchVG(player_name, server, game_type, auto)
-            if type(output) == str:
-                await self.bot.edit_message(msg, output)
-            else:
-                await self.bot.edit_message(msg, embed=output)
+        msg = await self.bot.say(notice)
+        output = VG_module.getLatestMatchVG(player_name, server, game_type, auto)
+        if type(output) == str:
+            await self.bot.edit_message(msg, output)
+        else:
+            await self.bot.edit_message(msg, embed=output)
 
 
 def setup(bot):

@@ -10,11 +10,13 @@ bot
 """
 
 # IMPORTS
-import discord
 from discord.ext import commands
+import main
 
 # BOT VARIABLES
 nameBOT = "EZLBot"
+OWNERS = ['198255568882761728', '164026892796690433', '102704301956149248', '139537219793715200']  # When you want to AUTHENTICATE the AUTHOR
+# serverprefixes = {}
 
 # CLASS containing ALL COMMANDS for THIS MODULE
 class Bot():
@@ -28,15 +30,26 @@ class Bot():
         self.bot = bot
 
     @commands.command(pass_context=True, hidden=True)
-    async def developer(self,message, command=""):
-        """A command used by developers."""
+    async def developer(self, raw, command=""):
+        """A command used by developers.
+
+                >developer (command)
+
+            command   ~   Command you would like to run   ~   Options: servers - list of all servers I'm in, notice - send message to all servers I'm in
+
+            Example:
+                >player notice This is the message I'll be sending to all the servers!!!
+
+        """
 
         # author = msg.message.author  # Get the AUTHOR of the MESSAGE
         # channel = msg.message.channel  # Get the CHANNEL of the MESSAGE
-        id = str(message.message.author.id)
-        print(id)
-        if id == "198255568882761728" or id == "164026892796690433" or id == "102704301956149248" or id == "139537219793715200":
+        discordID = str(raw.message.author.id)
+        # FOR DEBUGGING
+        # print(discordID)
+        if discordID in OWNERS:
             pass
+
         else:
             await self.bot.say("You aren't a developer! :stuck_out_tongue_closed_eyes:")
             return
@@ -51,25 +64,37 @@ class Bot():
             notice = "I'm in **" + str(len(self.bot.servers)) + "** servers total!\nNames are the Following:\n"
 
             for server in self.bot.servers:
-                notice += str(server.name)
+                notice += str(server.name) + ", "
 
             await self.bot.edit_message(msg, notice)
 
+        elif command == "notice":
+            msg = raw.message.content
+            msg = msg.split("notice")
+
+            # FOR DEBUGGING
+            # print(msg)
+
+            for server in self.bot.servers:
+                await self.bot.send_message(server.default_channel, msg[1])
 
         else:
             await self.bot.say(str(command) + " isn't a valid extension command... :sweat_smile:")
 
+    # Gives a LINK from where one CAN add THIS BOT
     @commands.command()
     async def invite(self):
         """When you want to invite this bot to another server."""
 
         await self.bot.say("You can invite me to any server at:\nhttp://ezlgg.com/bot")
 
+    # Gives a DESCRIPTION of the BOT
     @commands.command()
-    async def bot(self):
+    async def about(self):
         """Gives you some info on this bot."""
 
         await self.bot.say("Hi, I'm *" + str(nameBOT) + "*, and I've been developed in Python and have grown with lots of love. You can see a list of our commands with the **help** command!")
+
 
 def setup(bot):
     bot.add_cog(Bot(bot))

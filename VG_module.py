@@ -20,7 +20,7 @@ from VG_toolbox import giveMatchVG
 
 
 # VG Variables--
-keyVG = KEYGOESHERE
+keyVG = ""
 apiVG = gamelocker.Gamelocker(keyVG).Vainglory()  # API OBJECT
 
 # DISCORD EMBED VARIABLES--
