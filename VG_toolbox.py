@@ -145,7 +145,9 @@ def isServerVG(server):
             "sg",
             "sea",
             "ea",
-            "sa"
+            "sa",
+            "tournament-na",
+            "tournament-eu"
             ]
 
     if server in servers:  # Checks that SERVER is found in possible SERVER
