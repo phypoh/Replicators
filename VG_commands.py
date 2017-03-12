@@ -32,17 +32,17 @@ class Vg():
         self.bot = bot
 
     @commands.command()
-    async def stats(self, player_name="", server="na", game_type="any", days="7", auto="False"):
+    async def stats(self, player_name="", game_type="any", server="na", days="7", auto="False"):
         """Gets a players performance in the past days.
 
-                >stats (player_name) (server) (game_type) (days)
+                >stats (player_name) (game_type) (server) (days)
             player_name   ~   name of player to search for
-            server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sea or sg, ea, sa
             game_type     ~   game type you would like performance check   ~   default: any, options: any, casual, ranked, royale, blitz
+            server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sea or sg, ea, sa
             days          ~   day range to search from                     ~   default: 7, requirements: maximum: 93, minimum: 1
             
             example:
-                >stats player1 na casual 10
+                >stats player1 casual na 10
 
         """
         # AUTO IS A SECRET VARIABLE THAT MAKES COMPUTER CHECK EVERY SERVER FOR PLAYER !!!WASTE OF API KEY!!!
@@ -230,16 +230,16 @@ class Vg():
 
 
     @commands.command()
-    async def match(self, player_name="", server="na", game_type="any", auto="False"):
+    async def match(self, player_name="", game_type="any", server="na", auto="False"):
         """Fetched the latest Vainglory match.
 
-                >player (player_name) (server) (game_type)
+                >player (player_name) (game_type) (server)
             player_name   ~   name of player to check for
-            server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sea or sg, ea, sa
             game_type     ~   game type you would like performance check   ~   default: any, options: any, casual, ranked, royale, blitz
+            server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sea or sg, ea, sa
 
             Example:
-                >match player1 na casual
+                >match player1 casual na
 
         """
         game_type = game_type.lower()

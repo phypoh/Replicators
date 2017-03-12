@@ -48,8 +48,9 @@ def giveMatchVG(match, mode=0):
      "ranked": "Rank Match"}
      
     reverse_match = {
+    "casual": "casual",
     "blitz": "blitz_pvp_ranked",
-    "royal": "casual_aral",
+    "royale": "casual_aral",
     "rank": "ranked"    
     }
     if mode == 0:
