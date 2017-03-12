@@ -27,7 +27,7 @@ class Bot():
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, hidden=True)
     async def developer(self,message, command=""):
         """A command used by developers."""
 
