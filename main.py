@@ -84,6 +84,7 @@ async def on_server_remove(server):
     serverprefixes.pop(server.id, None)
     storePrefix()
 
+
     # FOR DEBUGGING
     # print(serverprefixes)
 
@@ -94,7 +95,6 @@ async def owner(ctx):
     """ONLY FOR BOT OWNERS"""
     pass
 
-
 @owner.command(pass_context=True, hidden=True)
 async def load(raw, module: str):
     if raw.message.author.id not in OWNERS:
@@ -102,6 +102,7 @@ async def load(raw, module: str):
 
     bot.load_extension(module)
     await bot.say("K")
+
 
 
 @owner.command(pass_context=True, hidden=True)

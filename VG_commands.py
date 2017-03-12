@@ -49,6 +49,7 @@ class Vg():
         # FALSE = WILL ONLY CHECK GIVEN SERVER, TRUE = WILL CHECK ALL SERVERS UNTIL FINDING PLAYER
 
         # MESSAGE the USER if NO NAME was GIVEN
+        game_type = game_type.lower()
         if player_name == "":
             await self.bot.say("You need to give a player's name at least...")
             return
@@ -159,6 +160,8 @@ class Vg():
                 >player player1 na user
 
         """
+        mode = mode.lower()
+        server = server.lower()
 
         # AUTO IS A SECRET VARIABLE THAT MAKES COMPUTER CHECK EVERY SERVER FOR PLAYER !!!WAIST OF API KEY!!!
         # FALSE = WILL ONLY CHECK GIVEN SERVER, TRUE = WILL CHECK ALL SERVERS UNTIL FINDING PLAYER
@@ -239,6 +242,7 @@ class Vg():
                 >match player1 na casual
 
         """
+        game_type = game_type.lower()
 
         # AUTO IS A SECRET VARIABLE THAT MAKES COMPUTER CHECK EVERY SERVER FOR PLAYER !!!WAIST OF API KEY!!!
         # FALSE = WILL ONLY CHECK GIVEN SERVER, TRUE = WILL CHECK ALL SERVERS UNTIL FINDING PLAYER
