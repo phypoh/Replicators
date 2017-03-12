@@ -116,7 +116,8 @@ class Bot():
             await self.bot.say('Sorry, but you have to be an **admin** to change the prefix.')
             return
 
-        list = [raw.message.server.id, prefix]
+        main.serverprefixes[raw.message.server.id] = prefix
+        # list = [raw.message.server.id, prefix]
 
         await self.bot.say("**prefixed changed to " + str(prefix) + "**\nPlease don't forget your new prefix.\nWant me good as new? Just kick me out of the server and reinvite me.")
         main.storePrefix()
