@@ -16,10 +16,6 @@ import TOOL_module as tools
 import VG_module
 import VG_toolbox
 
-# VG Variables--
-keyVG = KEYGOESHERE  # VG_API_TOKEN_HERE
-apiVG = gamelocker.Gamelocker(keyVG).Vainglory()  # API OBJECT
-
 # DISCORD EMBED VARIABLES--
 botImageDISCORD = "http://i63.tinypic.com/9k6xcj.jpg"  # URL of BOTS IMAGE
 signatureDISCORD = "Big Thanks to SEMC and MadGlory! Made with love ~ xoxo"  # String used in FOOTER as MESSAGE
