@@ -39,19 +39,23 @@ def giveMatchVG(match, mode=0):
     
     match_dict = {
      "blitz_pvp_ranked": "Blitz",
-     "casual_aral": "Battle Royal",
+     "casual_aral": "Battle Royale",
      "private": "Private Casual",
      "private_party_draft_match": "Private Draft",
      "private_party_blitz_match": "Private Blitz",
-     "private_party_aral_match":"Private Battle Royal",
+     "private_party_aral_match":"Private Battle Royale",
      "casual": "Casual Match",
-     "ranked": "Rank Match"}
+     "ranked": "Rank Match",
+    }
      
     reverse_match = {
     "casual": "casual",
     "blitz": "blitz_pvp_ranked",
     "royale": "casual_aral",
-    "rank": "ranked"    
+    "rank": "ranked",
+    "ranked": "ranked",
+    "br": "casual_aral",
+    "battle": "casual_aral"
     }
     if mode == 0:
         try:
