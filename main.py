@@ -41,7 +41,7 @@ async def on_server_remove(server):
     storePrefix()
 #Used to change the prefix
 
-@bot.command(pass_context=True)
+@bot.command(pass_context=True, hidden=True)
 async def specialannouncement(ctx, *, msg: str):
     if ctx.message.author.id not in OWNER:
         return
@@ -60,7 +60,7 @@ async def prefix(ctx, prefix: str):
     await bot.say("Please don't forget your new prefix. To reset it back to default just kick me out of the server and reinvite me.")
     storePrefix()
 
-@bot.group(pass_context=True)
+@bot.group(pass_context=True, hidden=True)
 async def owner(ctx):
     """ONLY FOR BOT OWNERS"""
     pass
@@ -69,21 +69,21 @@ async def owner(ctx):
 async def on_ready():
     await bot.change_presence(game=discord.Game(name='$help'))
     
-@owner.command(pass_context=True)
+@owner.command(pass_context=True, hidden=True)
 async def load(ctx, module: str):
     if ctx.message.author.id not in OWNER:
         return
     bot.load_extension(module)
     await bot.say("K")
 
-@owner.command(pass_context=True)
+@owner.command(pass_context=True, hidden=True)
 async def unload(ctx, module: str):
     if ctx.message.author.id not in OWNER:
         return
     bot.unload_extension(module)
     await bot.say("K")
 
-@owner.command(pass_context = True)
+@owner.command(pass_context = True, hidden=True)
 async def reload(ctx, module: str):
     if ctx.message.author.id not in OWNER:
         return
