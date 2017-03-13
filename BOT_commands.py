@@ -84,7 +84,10 @@ class Bot():
                     except:
                         pass
         else:
-            await self.bot.say(str(command) + " isn't a valid extension command... :sweat_smile:")
+            try:
+                await self.bot.say(str(command) + " isn't a valid extension command... :sweat_smile:")
+            except:
+                pass
 
     # Gives a LINK from where one CAN add THIS BOT
     @commands.command()
