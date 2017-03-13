@@ -358,7 +358,7 @@ class Vg():
 
 
     @commands.command(pass_context=True)
-    async def match(self, raw, player_name="", server="na", game_mode="any", auto="False"):
+    async def latest(self, raw, player_name="", server="na", game_mode="any", auto="False"):
         """Fetched the latest Vainglory match.
 
                 >player (player_name) (server) (game_mode)
