@@ -181,8 +181,8 @@ class Vg():
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    async def stats(self, player_name="", server="na", game_mode="any", days="7", auto="False"):
+    @commands.command(pass_context=True)
+    async def stats(self, raw, player_name="", server="na", game_mode="any", days="7", auto="False"):
         """Gets a players performance in the past days.
 
                 >stats (player_name) (server) (game_mode) (days)
@@ -195,8 +195,35 @@ class Vg():
                 >stats player1 na casual 7
 
         """
+
         # AUTO IS A SECRET VARIABLE THAT MAKES COMPUTER CHECK EVERY SERVER FOR PLAYER !!!WASTE OF API KEY!!!
         # FALSE = WILL ONLY CHECK GIVEN SERVER, TRUE = WILL CHECK ALL SERVERS UNTIL FINDING PLAYER
+
+        # Checks if NOTHING was GIVEN
+        if player_name == "" and server == "na" and game_mode == "any" and days == "7" and auto == "False":
+
+            discordID = raw.message.author.id
+
+            # If author in VGQ then GET DATA
+            data = config.playersVGQ.get(discordID, False)  # Get the PREFIX for SERVER
+
+            if data == False:
+                await self.bot.say("You need to add yourself to the **VGQ** first! :face_palm:\nEnter the help command followed by saveVG to see more... :stuck_out_tongue:")
+                return
+
+            else:
+                notice = "Looking at stats of **any** matches for **" + data["IGN"] + "** from the past **31** days in the **" + data["Region"] + "** region... :eyes:"  # MESSAGE being SENT BEFOREHAND
+
+                msg = await self.bot.say(notice)
+                output = VG_module.getPlayerPerformanceVG(data["IGN"], data["Region"], "", 31)
+
+                if type(output) == str:
+                    await self.bot.edit_message(msg, output)
+                    return
+
+                else:
+                    await self.bot.edit_message(msg, embed=output)
+                    return
 
         # FOR DEBUGGING
         print("INPUT - PLAYER_NAME: " + str(player_name) + "   | GAME_MODE: " + str(game_mode) + "   | SERVER: " + str(server) + "   | DAYS: " + str(days) + "   | AUTO: " + str(auto))
@@ -223,16 +250,16 @@ class Vg():
 
         # NOTICE USER that THEIR COMMAND is being PROCESSED
         msg = await self.bot.say(notice)
+
         # RUNS PERFORMANCE FETCH and UPDATES MESSAGE once DONE
-        
         output = VG_module.getPlayerPerformanceVG(player_name, server, game_mode, days, auto)
         if type(output) == str:
                 await self.bot.edit_message(msg, output)
         else:
             await self.bot.edit_message(msg, embed=output)
 
-    @commands.command()
-    async def player(self, player_name="", server="na", auto="False"):
+    @commands.command(pass_context=True)
+    async def player(self, raw, player_name="", server="na", auto="False"):
         """Checks if player exist in vainglory.
 
                 >player (player_name) (server) (mode)
@@ -244,10 +271,36 @@ class Vg():
 
         """
 
-        server = server.lower()
-
         # AUTO IS A SECRET VARIABLE THAT MAKES COMPUTER CHECK EVERY SERVER FOR PLAYER !!!WAIST OF API KEY!!!
         # FALSE = WILL ONLY CHECK GIVEN SERVER, TRUE = WILL CHECK ALL SERVERS UNTIL FINDING PLAYER
+
+        # Checks if NOTHING was GIVEN
+        if player_name == "" and server == "na" and auto == "False":
+
+            discordID = raw.message.author.id
+
+            # If author in VGQ then GET DATA
+            discordID = raw.message.author.id
+
+            data = config.playersVGQ.get(discordID, False)  # Get the PREFIX for SERVER
+
+            if data == False:
+                await self.bot.say("You need to add yourself to the **VGQ** first! :face_palm:\nEnter the help command followed by saveVG to see more... :stuck_out_tongue:")
+                return
+
+            else:
+                notice = "Looking for **" + str(data["IGN"]) + "** in the past **31** days in the **" + str(data["Region"]) + "** region... :eyes:"  # MESSAGE being SENT BEFOREHAND
+
+                msg = await self.bot.say(notice)
+                output = VG_module.getPlayerInfoVG(data["IGN"], data["Region"])
+
+                if type(output) == str:
+                    await self.bot.edit_message(msg, output)
+                    return
+
+                else:
+                    await self.bot.edit_message(msg, embed=output)
+                    return
 
         # FOR DEBUGGING
         print("INPUT - PLAYER_NAME: " + str(player_name) + "   | SERVER: " + str(server) + "   | AUTO: " + str(auto))
@@ -277,8 +330,8 @@ class Vg():
             await self.bot.edit_message(msg, embed=output)  # RUNS ID TEST
 
 
-    @commands.command()
-    async def match(self, player_name="", server="na", game_mode="any", auto="False"):
+    @commands.command(pass_context=True)
+    async def match(self, raw, player_name="", server="na", game_mode="any", auto="False"):
         """Fetched the latest Vainglory match.
 
                 >player (player_name) (server) (game_mode)
@@ -294,6 +347,32 @@ class Vg():
 
         # AUTO IS A SECRET VARIABLE THAT MAKES COMPUTER CHECK EVERY SERVER FOR PLAYER !!!WAIST OF API KEY!!!
         # FALSE = WILL ONLY CHECK GIVEN SERVER, TRUE = WILL CHECK ALL SERVERS UNTIL FINDING PLAYER
+
+        # Checks if NOTHING was GIVEN
+        if player_name == "" and server == "na" and game_mode == "any" and auto == "False":
+
+            discordID = raw.message.author.id
+
+            # If author in VGQ then GET DATA
+            data = config.playersVGQ.get(discordID, False)  # Get the PREFIX for SERVER
+
+            if data == False:
+                await self.bot.say("You need to add yourself to the **VGQ** first! :face_palm:\nEnter the help command followed by saveVG to see more... :stuck_out_tongue:")
+                return
+
+            else:
+                notice = "Looking for **any** match from **" + data["IGN"] + "** from the past **31** days in the **" + data["Region"] + "** region... :eyes:"  # MESSAGE being SENT BEFOREHAND
+
+                msg = await self.bot.say(notice)
+                output = VG_module.getLatestMatchVG(data["IGN"], data["Region"], "")
+
+                if type(output) == str:
+                    await self.bot.edit_message(msg, output)
+                    return
+
+                else:
+                    await self.bot.edit_message(msg, embed=output)
+                    return
 
         # FOR DEBUGGING
         print("INPUT - PLAYER_NAME: " + str(player_name) + "   | GAME_MODE: " + str(game_mode) + "   | SERVER: " + str(server) + "   | AUTO: " + str(auto))
@@ -388,7 +467,7 @@ class Vg():
             notice = "Looking at stats of **any** matches for **" + data["IGN"] + "** from the past **31** days in the **" + data["Region"] + "** region... :eyes:"  # MESSAGE being SENT BEFOREHAND
 
             msg = await self.bot.say(notice)
-            output = VG_module.getLatestMatchVG(data["IGN"], data["Region"], "")
+            output = VG_module.getPlayerPerformanceVG(data["IGN"], data["Region"], "", 31)
 
             if type(output) == str:
                 await self.bot.edit_message(msg, output)
