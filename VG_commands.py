@@ -25,7 +25,7 @@ signatureDISCORD = "Big Thanks to SEMC and MadGlory! Made with love ~ xoxo"  # S
 # Stores PLAYERVGQ DICT
 def storePlayersVGQ():
     with open("playersVGQ.pickle", "wb") as handle:
-        pickle.dump(config.serverprefixes, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(config.playersVGQ, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 # FOR DEBUGGING

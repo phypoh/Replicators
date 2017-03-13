@@ -10,22 +10,27 @@ descriptionBOT = "EZLBot is a bot created for Discord to utilize the VG api!"
 bot = commands.Bot(command_prefix='$', description=descriptionBOT)
 
 OWNERS = ['198255568882761728', '164026892796690433', '102704301956149248', '139537219793715200']  # When you want to AUTHENTICATE the AUTHOR
-# serverprefixes = {}  # DICTIONARY of all SERVERS PREFIX
 
 # Loads serverprefixes dict from the pickle file
 try:
     with open('prefixes.pickle', 'rb') as handle:
         config.serverprefixes = pickle.load(handle)
 
+    # FOR DEBUGGING
+    print(str(config.serverprefixes) + "   |   LOADED PREFIXES")
+
+except:
+    print("No Prefixes Yet")
+
+try:
     with open('playersVGQ.pickle', 'rb') as handle:
         config.playersVGQ = pickle.load(handle)
 
     # FOR DEBUGGING
-    # print(str(config.serverprefixes) + "   |   LOADED PREFIXES")
-    # print(str(config.playersVGQ) + "   |   LOADED PLAYERVGQ")
+    print(str(config.playersVGQ) + "   |   LOADED PLAYERVGQ")
 
 except:
-    print("No Prefixes Yet")
+    print("No VGQ Yet")
 
 # Do when the BOT is ready to RUN
 @bot.event
