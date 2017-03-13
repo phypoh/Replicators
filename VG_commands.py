@@ -17,10 +17,13 @@ import VG_module
 import VG_toolbox
 import config
 import pickle
+from VG_module import getMatches, apiVG
+import dateutil.parser,asyncio
 
 # DISCORD EMBED VARIABLES--
 botImageDISCORD = "http://i63.tinypic.com/9k6xcj.jpg"  # URL of BOTS IMAGE
-signatureDISCORD = "Big Thanks to SEMC and MadGlory! Made with love ~ xoxo"  # String used in FOOTER as MESSAGE
+signatureDISCORD = "Big Thanks to SEMC and MadGlory! Made with love."  # String used in FOOTER as MESSAGE
+msgs = dict()
 
 # Stores PLAYERVGQ DICT
 def storePlayersVGQ():
@@ -181,6 +184,30 @@ class Vg():
     def __init__(self, bot):
         self.bot = bot
 
+    async def on_reaction_add(self, reaction,user):
+        if reaction.message.id in msgs.keys() and reaction.emoji == '➡':
+            msg = reaction.message
+            msgs[msg.id]['page'] += 1
+            page = msgs[msg.id]['page']
+            await self.bot.edit_message(reaction.message,new_content='Embed: ', embed=getMatches(msgs[msg.id]['ign'], msgs[msg.id]['m'][page-1], msgs[msg.id]['region'],page,msgs[msg.id]['num']))
+        elif reaction.message.id in msgs.keys() and reaction.emoji == '⬅':
+            msg = reaction.message
+            msgs[msg.id]['page'] -= 1
+            page = msgs[msg.id]['page']
+            await self.bot.edit_message(reaction.message,new_content='Embed: ', embed=getMatches(msgs[msg.id]['ign'], msgs[msg.id]['m'][page-1], msgs[msg.id]['region'],page,msgs[msg.id]['num']))
+
+    async def on_reaction_remove(self, reaction,user):
+        if reaction.message.id in msgs.keys() and reaction.emoji == '➡':
+            msg = reaction.message
+            msgs[msg.id]['page'] += 1
+            page = msgs[msg.id]['page']
+            await self.bot.edit_message(reaction.message,new_content='Embed: ', embed=getMatches(msgs[msg.id]['ign'], msgs[msg.id]['m'][page-1], msgs[msg.id]['region'],page,msgs[msg.id]['num']))
+        elif reaction.message.id in msgs.keys() and reaction.emoji == '⬅':
+            msg = reaction.message
+            msgs[msg.id]['page'] -= 1
+            page = msgs[msg.id]['page']
+            await self.bot.edit_message(reaction.message,new_content='Embed: ', embed=getMatches(msgs[msg.id]['ign'], msgs[msg.id]['m'][page-1], msgs[msg.id]['region'],page,msgs[msg.id]['num']))
+
     @commands.command(pass_context=True)
     async def stats(self, raw, player_name="", server="na", game_mode="any", days="31", auto="False"):
         """Gets a players performance in the past days.
@@ -190,7 +217,7 @@ class Vg():
             server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sea or sg, ea, sa
             game_mode     ~   game mode you would like performance check   ~   default: any, options: any, casual, ranked, royale, blitz
             days          ~   day range to search from                     ~   default: 31, requirements: maximum: 93, minimum: 1
-            
+
             example:
                 >stats player1 na casual 7
 
@@ -433,7 +460,7 @@ class Vg():
         await self.bot.say("Your In-game name, " + str(player_name) + ", and region, " + str(server) + ", has been saved to your account, " + str(author) + "... :hugging:")
         storePlayersVGQ()
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, hidden=True)
     async def VG(self, raw, data_type="player"):
         """Pull Vainglory data about yourself quick.
 
@@ -491,6 +518,50 @@ class Vg():
         else:
             await self.bot.say("That isn't a quick command... :sweat_smile:")
             return
+
+    @commands.command(pass_context=True)
+    async def matches(self,ctx, ign="", region = 'na',page=1 ,gamemode=''):
+        """
+        Reaction menu for all your matches! Works with VGQ.
+        $matches <ign> <region> <page> <gamemode>
+        E.X: $matches SpiesWithin na
+        """
+        if ign == "" and region == "na" and page == 1 and gamemode == "":
+            discordID = ctx.message.author.id
+            # If author in VGQ then GET DATA
+            data = config.playersVGQ.get(discordID, False)  # Get the PREFIX for SERVER
+            if data == False:
+                await self.bot.say("You need to add yourself to the **VGQ** first! :face_palm:\nEnter the help command followed by saveVG to see more... :stuck_out_tongue:")
+                return
+            else:
+                ign = data["IGN"]
+                region = data['region']
+        gamemode = gamemode.lower()
+        gamemode = reverse_match.get(gamemode, '')
+        region = region.lower()
+        msg = await self.bot.say("Fetching data for {}.".format(ign))
+        try:
+            m = apiVG.matches({"page[limit]": 50, "filter[playerNames]": ign, "filter[createdAt-start]": "2017-01-01T08:25:30Z", "sort": "-createdAt", "filter[gameMode]": gamemode}, region = region)
+        except:
+            await self.bot.say("Error! Please check everything and use $help matches for more info. Remember it **is** caps sensitive.")
+            return
+        m = sorted(m, key=lambda d: d.createdAt, reverse=True)
+        num = len(m)
+        try:
+            msg = await self.bot.edit_message(msg, new_content= 'Embed:', embed = getMatches(ign, m[page-1], region,page,num))
+        except:
+            await self.bot.edit_message(msg, new_content="Sorry, couldn't find data for {} in {}. Check your region and or spelling. It **IS** caps sensitive.".format(ign, region))
+        await self.bot.add_reaction(msg, '\U00002b05')
+        await self.bot.add_reaction(msg, '\U000027a1')
+        #Get emojis from http://www.fileformat.info/info/unicode/char/27a1/browsertest.htm
+        #or by messaging R. Danny in discordpy server
+        msgs[msg.id] = {"ign": ign, 'm': m, 'page': page-1,'region':region,'num':num}
+        await asyncio.sleep(300)
+        try:
+            del msgs[msg.id]
+            pass
+        except:
+            pass
 
 def setup(bot):
     bot.add_cog(Vg(bot))

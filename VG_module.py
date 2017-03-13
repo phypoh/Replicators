@@ -27,6 +27,61 @@ apiVG = gamelocker.Gamelocker(keyVG).Vainglory()  # API OBJECT
 botImageDISCORD = "http://i63.tinypic.com/9k6xcj.jpg"  # URL of BOTS IMAGE
 signatureDISCORD = "Thanks to SEMC and MadGlory made with love ~ xoxo"  # String used in FOOTER as MESSAGE
 
+
+heroes = {
+        "*Adagio*": "Adagio",
+        "*Alpha*": "Alpha",
+        "*Ardan*": "Ardan",
+        "*Baron*": "Baron",
+        "*Blackfeather*": "Blackfeather",
+        "*Catherine*": "Catherine",
+        "*Celeste*": "Celeste",
+        "*Flicker*": "Flicker",
+        "*Fortress*": "Fortress",
+        "*Glaive*": "Glaive",
+        "*Gwen*": "Gwen",
+        "*Hero009*": "Krul",
+        "*Hero010*": "Skaarf",
+        "*Hero016*": "Rona",
+        "*Idris*": "Idris",
+        "*Joule*": "Joule",
+        "*Kestrel*": "Kestrel",
+        "*Koshka*": "Koshka",
+        "*Lance*": "Lance",
+        "*Lyra*": "Lyra",
+        "*Ozo*": "Ozo",
+        "*Petal*": "Petal",
+        "*Phinn*": "Phinn",
+        "*Reim*": "Reim",
+        "*Ringo*": "Ringo",
+        "*Samuel*": "Samuel",
+        "*SAW*": "SAW",
+        "*Sayoc*": "Taka",
+        "*Skye*": "Skye",
+        "*Vox*": "Vox"
+    }
+match_dict = {
+"blitz_pvp_ranked": "Blitz",
+"casual_aral": "Battle Royale",
+"private": "Private Casual",
+"private_party_draft_match": "Private Draft",
+"private_party_blitz_match": "Private Blitz",
+"private_party_aral_match":"Private Battle Royale",
+"casual": "Casual Match",
+"ranked": "Rank Match"
+}
+
+reverse_match = {
+"casual": "casual",
+"blitz": "blitz_pvp_ranked",
+"royale": "casual_aral",
+"rank": "ranked",
+"rank": "ranked",
+"ranked": "ranked",
+"br": "casual_aral",
+"battle": "casual_aral"
+}
+
 # GETS MATCH OBJECTS and RETURNS INFO
 def getMatchesVG(amount=50, name="", server="na", game_mode="any", days=31, auto=False):
     amount = int(amount)         # Convert AMOUNT to a STRING to prevent ERRORS
@@ -199,7 +254,7 @@ def getPlayerInfoVG(name, server="", auto=False):
     #     return "The player **" + name + "** was found in the Vainglory servers in the past 31 days!"
     # if mode == "dev":  # If MODE is DEV send ID with MESSAGE
     #     return "The player **" + name + "** was found in the Vainglory servers in the past 31 days! ID: " + id
-    
+
 
 
 # Get a PLAYERS performance from RANGE of DAYS with the players NAME
@@ -490,7 +545,7 @@ def getPlayerPerformanceVG(name, server="", game_mode="", days=7, auto=False):
 
     # SEND the EMBED
     return embed
-    
+
 def getLatestMatchVG(name, server="na", game_mode="", auto=False):
     name = str(name)             # Convert ID to a STRING to prevent ERRORS
     server = str(server)         # Convert SERVER to STRING to prevent ERRORS
@@ -717,3 +772,59 @@ def getLatestMatchVG(name, server="na", game_mode="", auto=False):
 
     # SEND the EMBED
     return embed
+
+def getMatches(ign, m, region='na',page =1, num =1):
+    t1_tier = 0
+    t2_tier = 0
+    t1 = m.rosters[0]
+    t2 = m.rosters[1]
+    t1_participants = ''
+    t2_participants = ''
+    duration  = format((m.duration // 60) + ((m.duration % 60) /100), '.2f')
+    duration = duration.replace('.', ':')
+    for i in m.rosters[0].participants:
+        i.actor = heroes.get(i.actor, i.actor)
+        i.actor = (i.actor).replace('*','')
+        if i.player.name == ign:
+            player = i
+        t1_tier += i.stats['skillTier']
+    for i in m.rosters[1].participants:
+        i.actor = heroes.get(i.actor, i.actor)
+        i.actor = (i.actor).replace('*','')
+        if i.player.name == ign:
+            t1_tier,t2_tier = t2_tier,t1_tier
+            t1,t2 = t2,t1
+            player = i
+        t2_tier += i.stats['skillTier']
+
+    gamemode = match_dict.get(m.gameMode, m.gameMode)
+    if t1.participants[0].stats['winner']:
+        result = 'Victory'
+        resultcolor = 0x2fe26e
+        thumburl = 'https://s2.postimg.org/barjsw3e1/victory.png'
+    else:
+        result = 'Defeat'
+        resultcolor = 0xe22f2f
+        thumburl = 'https://s1.postimg.org/y4uwz4eu7/defeat.png'
+
+    if t1.stats['side'] == 'left/blue':
+        t1_color = "Blue:"
+        t2_color = "Orange:"
+    else:
+        t1_color = "Orange:"
+        t2_color = "Blue:"
+    for i in t1.participants:
+        t1_participants += '**{}** | {} | {}/{}/{}\n'.format(i.player.name, i.actor, i.stats['kills'], i.stats['deaths'], i.stats['assists'])
+    for i in t2.participants:
+        t2_participants += '**{}** | {} | {}/{}/{}\n'.format(i.player.name, i.actor, i.stats['kills'], i.stats['deaths'], i.stats['assists'])
+    details = "{} Kills {} | {} Turrets {} | {} Krakens {} | {} Aces {} | {} Gold {}".format(str(t1.stats['heroKills']), str(t2.stats['heroKills']), str(t1.stats['turretsRemaining']), str(t2.stats['turretsRemaining']), str(t1.stats['krakenCaptures']),str( t2.stats['krakenCaptures']), str(t1.stats['acesEarned']), str(t2.stats['acesEarned']), str(t1.stats['gold']), str(t2.stats['gold']))
+    winchance = str(int(round(100 * (t1_tier/ (t1_tier+t2_tier)), 0)))
+    krakens = str(m.rosters[0].stats['krakenCaptures'] + m.rosters[1].stats['krakenCaptures'])
+    em = discord.Embed(title=result +' | '+ gamemode, description= '{} Minutes Long.\n{} Krakens Taken.\nVictory Chance: {}%'.format(duration, krakens, winchance) , colour=resultcolor, url = "http://ezlgg.com", timestamp = dateutil.parser.parse(m.createdAt).replace(tzinfo=None))
+    em.add_field(name = t1_color, value = t1_participants)
+    em.add_field(name = t2_color, value = t2_participants)
+    em.add_field(name = "Details:", value = details, inline = False)
+    em.set_author(name=ign, icon_url="http://www.vaingloryfire.com/images/wikibase/icon/heroes/"+player.actor+".png", url = 'http://www.vaingloryfire.com/vainglory/wiki/heroes/'+player.actor)
+    em.set_footer(text= ign+' | Page {}/{}'.format(str(page),str(num)), icon_url= "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcREVEEL3vFm3boDZD0aSwSPFtZ2EXJGwiEjsnvXXTluLqXrD0mknNohwA")
+    em.set_thumbnail(url = thumburl)
+    return em
