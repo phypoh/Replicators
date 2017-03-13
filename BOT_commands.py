@@ -80,7 +80,10 @@ class Bot():
                 await self.bot.send_message(server.default_channel, msg[1])
 
         else:
-            await self.bot.say(str(command) + " isn't a valid extension command... :sweat_smile:")
+            try:
+                await self.bot.say(str(command) + " isn't a valid extension command... :sweat_smile:")
+            except:
+                pass
 
     # Gives a LINK from where one CAN add THIS BOT
     @commands.command()
