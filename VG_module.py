@@ -27,26 +27,39 @@ apiVG = gamelocker.Gamelocker(keyVG).Vainglory()  # API OBJECT
 botImageDISCORD = "http://i63.tinypic.com/9k6xcj.jpg"  # URL of BOTS IMAGE
 signatureDISCORD = "Thanks to SEMC and MadGlory made with love ~ xoxo"  # String used in FOOTER as MESSAGE
 
-
-# GETS a PLAYERS life time INFORMATION
-def getPlayerInfoVG(name, server="", mode="", auto=False):
-    name = str(name)  # Convert ID to a STRING to prevent errors
-    server = str(server)  # Convert SERVER to STRING to prevent errors
-    mode = str(mode)  # Convert MODE to STRING to prevent errors
-    auto = bool(auto)  # Convert AUTO to BOOLEAN to prevent errors
+# GETS MATCH OBJECTS and RETURNS INFO
+def getMatchesVG(amount=50, name="", server="na", game_mode="any", days=31, auto=False):
+    amount = int(amount)         # Convert AMOUNT to a STRING to prevent ERRORS
+    name = str(name)             # Convert ID to a STRING to prevent ERRORS
+    server = str(server)         # Convert SERVER to STRING to prevent ERRORS
+    game_mode = str(game_mode)   # Convert MODE to STRING to prevent ERRORS
+    days = int(days)             # Convert DAYS to STRING to prevent ERRORS
+    auto = bool(auto)            # Convert AUTO to BOOLEAN to prevent errors
 
     # FOR DEBUGGING
-    # print(name + "  |  " + server + "  |  " + mode + "  |  " + str(auto))
+    # print("Amount: " + str(amount) + "  |Name: " + name + "  |Server: " + server + "  |Game Mode: " + game_mode + "  |Days: " + str(days) + "  |Auto: " + str(auto))
 
-    # ADD when FETCHING from VG API!!! example: {"filter[createdAt-start]": daterange, "filter[createdAt-end]": datenow, etc...}
+    # DATE RANGE when FETCHING from MATCHES!!! example: {"filter[createdAt-start]": daterange, "filter[createdAt-end]": datenow, etc...}
     datenow = datetime.date.today()
-    daterange = str(datenow - datetime.timedelta(days=31)) + "T00:00:00Z"  # Get the DATE RANGE to SEARCH from
-    datenow = str(datetime.date.today()) + "T00:00:00Z"  # CURRENT DATE
-    
-    filterVG = {'filter[createdAt-start]': daterange, 'page[limit]': 1, 'filter[playerNames]': name, "sort": "-createdAt"}          
-        
+    daterange = str(datenow - datetime.timedelta(days=days)) + "T00:00:00Z"  # Get the DATE RANGE to SEARCH from
+    # datenow = str(datetime.date.today()) + "T00:00:00Z"  # CURRENT DATE
+
+    # BUILD FILTER used to GET MATCHES
+    filterVG = {'filter[createdAt-start]': daterange, 'page[limit]': amount, 'filter[playerNames]': name, "sort": "-createdAt"}
+
+    if game_mode == "any" or game_mode == "":
+        pass
+
+    else:
+        filterVG["filter[gameMode]"] = giveMatchVG(game_mode, 1)
+
+    # FOR DEBUGGING
+    # print(str(filterVG) + "   |   FILTER USED")
+
+    # If AUTO is TRUE then SEARCH in every SERVER until you FIND
     if auto == True:
 
+        # SERVERS to SEARCH THROUGH
         servers = [
             "na",
             "eu",
@@ -55,42 +68,52 @@ def getPlayerInfoVG(name, server="", mode="", auto=False):
             "sa",
             "tournament-na",
             "tournament-eu"
-        ]
+            ]
 
-        for serverTry in servers:
+        for serverName in servers:
             try:
-                matches = apiVG.matches(filterVG, serverTry)
+                matches = apiVG.matches(filterVG, serverName)
+                break  # BREAK loop once a MATCH was FOUND
+
             except:
-                matches = 0
-                
-        if matches == 0:
-            return "Couldn't get any matches for **" + str(name) + "** from the past 31 days in any server!"  # RETURN if player MATCHES AREN'T FOUND
+                matches = False
+
+        if matches == False:
+            return False
 
     elif auto == False:
         try:  # GIVEN the SERVER try to FIND MATCHES for PLAYER
             matches = apiVG.matches(filterVG, server)
+
         except:
-            return "Couldn't get any matches for **" + str(name) + "** from the past 31 days in " + str(server) + " server!"
+            return False
 
     else:
-        print("!!!HUGE ERROR!!!")
-        return "!!!HUGE ERROR!!!"
+        print("!!!HUGE ERROR WHILE TRYING TO GET MATCHES!!!")
+        return "!!!HUGE ERROR WHILE TRYING TO GET MATCHES!!!"
 
-    # MATCH VARIABLES
-    IGN = ""
-    level = ""
-    lifetimeGold = ""
-    lossStreak = ""
-    played = ""
-    winStreak = ""
-    wins = ""
-    xp = ""
-    skillTier = ""
-    thumbnail = ""
-    karmaLevel = ""
+    return matches
+
+
+# GETS a PLAYERS life time INFORMATION
+def getPlayerInfoVG(name, server="", auto=False):
+    name = str(name)             # Convert ID to a STRING to prevent ERRORS
+    server = str(server)         # Convert SERVER to STRING to prevent ERRORS
+    auto = bool(auto)            # Convert AUTO to BOOLEAN to prevent errors
+
+    matches = getMatchesVG(1, name, server, auto=auto)
+
+    # If NO MATCHES were RETURNED
+    if matches == False:
+        return "Couldn't find anything on **" + str(name) + "** in the past **31** days in **" + str(server) + "** server!"
+
+    # MATCH VARIABLES USED
+    # IGN, level, lifetimeGold, lossStreak, played, winStreak, wins, xp,
+    # skillTier, thumbnail, karmaLevel, latestmatch, gamemode, skillTier, KarmaLevel
 
     for match in matches:  # From that MATCH get the VAINGLORY PLAYER ID
-        latestmatch = str(match.createdAt)
+        latestmatchraw = dateutil.parser.parse(match.createdAt)
+        latestmatch = latestmatchraw.strftime('%d/%m/%Y %H:%M:%S') + " GMT"
         gameMode = str(match.gameMode)
 
         for roaster in match.rosters:
@@ -136,9 +159,11 @@ def getPlayerInfoVG(name, server="", mode="", auto=False):
     # CREATES the STRING for LOSE
     loseString = "\n**Lost:** *" + str(int(played) - int(wins)) + "*"
 
+    # FORMAT USED TO CREATE STRINGS ~
     # CREATES the STRING for
     # String = "\n**:** *" +  + "*"
 
+    # EMBED CREATION****************************************************************************************************
     # Create the TITLE for EMBED
     title = "Vainglory Career for " + str(name)
 
@@ -147,9 +172,6 @@ def getPlayerInfoVG(name, server="", mode="", auto=False):
 
     # ASSEMBLE the STATS TOGETHER for EMBED
     staticsOne = str(lifetimeGoldString) + str(winStreakString) + str(lossStreakString) + str(playedString) + str(winsString) + str(loseString) + str(xpString)
-
-    if mode == "dev":
-        staticsOne += str(idString)
 
     # CREATE the EMBED
     embed = discord.Embed(title=title, colour=discord.Colour(0x4e9ff9), description=description,
@@ -181,57 +203,29 @@ def getPlayerInfoVG(name, server="", mode="", auto=False):
 
 
 # Get a PLAYERS performance from RANGE of DAYS with the players NAME
-def getPlayerPerformanceVG(name, server="", game="", days=7, auto=False):
-    name = str(name)  # Convert NAME to STRING to prevent errors
-    server = str(server)  # Convert SERVER to STRING to prevent errors
-    days = int(days)  # Convert DAYS to INT to prevent errors
-    game = str(game)  # Convert GAME to STRING to prevent errors
-    auto = bool(auto)  # Convert AUTO to BOOLEAN to prevent errors
+def getPlayerPerformanceVG(name, server="", game_mode="", days=7, auto=False):
+    name = str(name)             # Convert ID to a STRING to prevent ERRORS
+    server = str(server)         # Convert SERVER to STRING to prevent ERRORS
+    game_mode = str(game_mode)   # Convert MODE to STRING to prevent ERRORS
+    days = int(days)             # Convert DAYS to STRING to prevent ERRORS
+    auto = bool(auto)            # Convert AUTO to BOOLEAN to prevent errors
 
-    # ADD when FETCHING from VG API!!! example: {"filter[createdAt-start]": daterange, "filter[createdAt-end]": datenow, etc...}
-    datenow = datetime.date.today()
-    daterange = str(datenow - datetime.timedelta(days=days)) + "T00:00:00Z"  # Get the DATE RANGE to SEARCH from
-    datenow = str(datetime.date.today()) + "T00:00:00Z"  # CURRENT DATE
+    matches = getMatchesVG(50, name, server, game_mode, days, auto)
 
-    filterVG = {"filter[createdAt-start]": daterange, "page[limit]": 50, "filter[playerNames]": name, "sort": "-createdAt"}  # DEFAULT things to FILTER VG MATCHES BY
+    # If NO MATCHES were RETURNED
+    if matches == False:
+        msg = "Couldn't find"
 
-    if game != "any":
-        filterVG["filter[gameMode]"] = giveMatchVG(game, 1)
+        if game_mode != "":
+            msg += " any **" + str(game_mode) + "** matches"
 
-    # FOR DEBUGGING
-    # print(filterVG)
+        else:
+            msg += " anything"
 
-    if auto == True:
+        msg += " of **" + str(name) + "** in the past **" + str(days) + "** days in **" + str(
+            server) + "** server!"
 
-        servers = [
-            "na",
-            "eu",
-            "sg",
-            "ea",
-            "sa",
-            "tournament-na",
-            "tournament-eu"
-        ]
-
-        for serverTry in servers:
-            try:
-                matches = apiVG.matches(filterVG, serverTry)
-            except:
-                matches = 0
-
-        if matches == 0:
-            return "Couldn't get any matches for **" + str(name) + "** from the past 31 days in any server!"  # RETURN if player MATCHES AREN'T FOUND
-
-    elif auto == False:
-        try:  # GIVEN the SERVER try to FIND MATCHES for PLAYER
-            matches = apiVG.matches(filterVG, server)
-
-        except:
-            return "Couldn't get any matches for **" + str(name) + "** from the past " + str(days) + "days in the server in " + str(server) + " server!"
-
-    else:
-        print("Error")
-        return "!!!HUGE ERROR!!!"
+        return msg
 
     # MATCH VARIABLES
     latestmatch = ""
@@ -245,7 +239,7 @@ def getPlayerPerformanceVG(name, server="", game="", days=7, auto=False):
     for match in matches:
         if matchNum == size:  # If MATCH is the FIRST MATCH then GET DATA
             latestmatchraw = dateutil.parser.parse(match.createdAt)
-            latestmatch = latestmatchraw.strftime('%d/%m/%Y %H:%M:%S') + " GMT"            
+            latestmatch = latestmatchraw.strftime('%d/%m/%Y %H:%M:%S') + " GMT"
 
         gameMode.append(str(match.gameMode))
         duration.append(match.duration)
@@ -287,7 +281,7 @@ def getPlayerPerformanceVG(name, server="", game="", days=7, auto=False):
         attributes = data["attributes"]
         stats = attributes["stats"]
 
-        actor.append(pretty(attributes["actor"]))
+        actor.append(pretty(attributes["actor"]).replace("*", ""))
         assists.append(stats["assists"])
         crystalMineCaptures.append(stats["crystalMineCaptures"])
         deaths.append(stats["deaths"])
@@ -335,8 +329,8 @@ def getPlayerPerformanceVG(name, server="", game="", days=7, auto=False):
     if len(gamemodes) <= 0:  # If NO GAMEMODES were FOUND then NOTICE USER about it
         gamemodelistString = "\n**We couldn't get any game modes from your matches!**"
 
-    elif game != "":
-        gamemodelistString = "\n**This is performance from " + str(game) + " games only...**"
+    elif game_mode != "":
+        gamemodelistString = "\n**This is performance from " + str(game_mode) + " games only...**"
 
     else:
         gamemodelistString = "\n**Game Modes Played Most:**"  # SET TITLE to INFO
@@ -458,11 +452,11 @@ def getPlayerPerformanceVG(name, server="", game="", days=7, auto=False):
     # # CREATING  MEAN from the past X days
     # msg = "\n**** *" + str(round(tools.giveMeanOfList())) + "*"
 
-    if game == "":  # If no specific GAMETYPE was given then set GAME to ANY
-        game = "any"
+    if game_mode == "":  # If no specific GAMETYPE was given then set GAME to ANY
+        game_mode = "any"
 
     # Create the TITLE for EMBED
-    title = "Match performance from " + str(game) + " matches in the past " + str(days) + " days | Sampled: " + str(size) + " games"
+    title = "Match performance from " + str(game_mode) + " matches in the past " + str(days) + " days | Sampled: " + str(size) + " games"
 
     # Create the DESCRIPTION for the EMBED
     description = "**Player:** *" + str(name) + "* **| Lv:** *" + str(level) + "* **| ST:** *" + str(VG_toolbox.giveSkillTierVG(skillTier)) + "* **| K:** *" + str(VG_toolbox.giveKarmaVG(karmaLevel)) + "*\n**Last Game Registered:** *" + str(latestmatch) + "*\n" + str(durationString) + str(gamemodelistString) + "\n" + str(winnerString) + str(wentafkString)
@@ -497,70 +491,32 @@ def getPlayerPerformanceVG(name, server="", game="", days=7, auto=False):
     # SEND the EMBED
     return embed
     
-def getLatestMatchVG(name, server, game, auto):
-    name = str(name)  # Convert to STRING prevent ERRORS
-    server = str(server)  # Convert to STRING prevent ERRORS
-    game = str(game)  # Convert to STRING prevent ERRORS
-    auto = bool(auto)  # Convert to STRING prevent ERRORS
+def getLatestMatchVG(name, server="na", game_mode="", auto=False):
+    name = str(name)             # Convert ID to a STRING to prevent ERRORS
+    server = str(server)         # Convert SERVER to STRING to prevent ERRORS
+    game_mode = str(game_mode)   # Convert MODE to STRING to prevent ERRORS
+    auto = bool(auto)            # Convert AUTO to BOOLEAN to prevent errors
 
-    # ADD when FETCHING from VG API!!! example: {"filter[createdAt-start]": daterange, "filter[createdAt-end]": datenow, etc...}
-    datenow = datetime.date.today()
-    daterange = str(datenow - datetime.timedelta(days=31)) + "T00:00:00Z"  # Get the DATE RANGE to SEARCH from
-    datenow = str(datetime.date.today()) + "T00:00:00Z"  # CURRENT DATE
+    matches = getMatchesVG(1, name, server, game_mode=game_mode, auto=auto)
 
-    filterVG = {'filter[createdAt-start]': daterange, 'page[limit]': 1, 'filter[playerNames]': name, "sort": "-createdAt"}  # DEFAULT things to FILTER VG PLAYERS BY
+    # If NO MATCHES were RETURNED
+    if matches == False:
+        msg = "Couldn't find"
 
-    if game != "any":
-        filterVG["filter[gameMode]"] = giveMatchVG(game, 1)
+        if game_mode != "":
+            msg += " any **" + str(game_mode) + "** matches"
 
-    if auto == True:
+        else:
+            msg += " anything"
 
-        servers = [
-            "na",
-            "eu",
-            "sg",
-            "ea",
-            "sa",
-            "tournament-na",
-            "tournament-eu"
-        ]
+        msg += " of **" + str(name) + "** in the past **31** days in **" + str(
+            server) + "** server!"
 
-        for serverTry in servers:
-            try:
-                matches = apiVG.matches(filterVG, serverTry)
-            except:
-                matches = 0
+        return msg
 
-        if matches == 0:
-            return "Couldn't get any matches for **" + str(name) + "** from the past 31 days in any server!"  # RETURN if player MATCHES AREN'T FOUND
-
-    elif auto == False:
-        try:  # GIVEN the SERVER try to FIND MATCHES for PLAYER
-            matches = apiVG.matches(filterVG, server)
-
-        except:
-            return "Couldn't get any matches for **" + str(name) + "** from the past 31 days in " + str(server) + " server!"
-
-    else:
-        print("!!!HUGE ERROR!!!")
-        return "!!!HUGE ERROR!!!"
-
-    # MATCH VARIABLES
-    latestmatch = ""
-    gameMode = ""
-    winner = ""
-    heroKillsA = ""
-    goldA = ""
-    acesEarnedA = ""
-    krakenCapturesA = ""
-    turretKillsA = ""
-    turretsRemainingA = ""
-    heroKillsB = ""
-    goldB = ""
-    acesEarnedB = ""
-    krakenCapturesB = ""
-    turretKillsB = ""
-    turretsRemainingB = ""
+    # MATCH VARIABLES USED
+    # latestmatch, gameMode, winner, heroKillsA, goldA, acesEarnedA, krakenCapturesA, turretKillsA,
+    # turretsRemainingA ,heroKillsB, goldB, acesEarnedB, krakenCapturesB, turretKillsB, turretsRemainingB
     player1 = {}
     player2 = {}
     player3 = {}
@@ -571,7 +527,8 @@ def getLatestMatchVG(name, server, game, auto):
     roasternum = 0
     playernum = 0
     for match in matches:  # From that MATCH get the VAINGLORY PLAYER ID
-        latestmatch = str(match.createdAt)
+        latestmatchraw = dateutil.parser.parse(match.createdAt)
+        latestmatch = latestmatchraw.strftime('%d/%m/%Y %H:%M:%S') + " GMT"
         gameMode = str(match.gameMode)
 
         for roaster in match.rosters:
@@ -622,7 +579,7 @@ def getLatestMatchVG(name, server, game, auto):
                     player1["karmaLevel"] = str(matchstats["karmaLevel"])
                     player1["skillTier"] = str(matchstats["skillTier"])
 
-                    player1["actor"] = str(pretty(participant.actor))
+                    player1["actor"] = str(pretty(participant.actor).replace("*", ""))
                     player1["kills"] = str(matchstats["kills"])
                     player1["assists"] = str(matchstats["assists"])
                     player1["deaths"] = str(matchstats["deaths"])
@@ -634,7 +591,7 @@ def getLatestMatchVG(name, server, game, auto):
                     player2["karmaLevel"] = str(matchstats["karmaLevel"])
                     player2["skillTier"] = str(matchstats["skillTier"])
 
-                    player2["actor"] = str(pretty(participant.actor))
+                    player2["actor"] = str(pretty(participant.actor).replace("*", ""))
                     player2["kills"] = str(matchstats["kills"])
                     player2["assists"] = str(matchstats["assists"])
                     player2["deaths"] = str(matchstats["deaths"])
@@ -646,7 +603,7 @@ def getLatestMatchVG(name, server, game, auto):
                     player3["karmaLevel"] = str(matchstats["karmaLevel"])
                     player3["skillTier"] = str(matchstats["skillTier"])
 
-                    player3["actor"] = str(pretty(participant.actor))
+                    player3["actor"] = str(pretty(participant.actor).replace("*", ""))
                     player3["kills"] = str(matchstats["kills"])
                     player3["assists"] = str(matchstats["assists"])
                     player3["deaths"] = str(matchstats["deaths"])
@@ -661,7 +618,7 @@ def getLatestMatchVG(name, server, game, auto):
                     player4["karmaLevel"] = str(matchstats["karmaLevel"])
                     player4["skillTier"] = str(matchstats["skillTier"])
 
-                    player4["actor"] = str(pretty(participant.actor))
+                    player4["actor"] = str(pretty(participant.actor).replace("*", ""))
                     player4["kills"] = str(matchstats["kills"])
                     player4["assists"] = str(matchstats["assists"])
                     player4["deaths"] = str(matchstats["deaths"])
@@ -673,7 +630,7 @@ def getLatestMatchVG(name, server, game, auto):
                     player5["karmaLevel"] = str(matchstats["karmaLevel"])
                     player5["skillTier"] = str(matchstats["skillTier"])
 
-                    player5["actor"] = str(pretty(participant.actor))
+                    player5["actor"] = str(pretty(participant.actor).replace("*", ""))
                     player5["kills"] = str(matchstats["kills"])
                     player5["assists"] = str(matchstats["assists"])
                     player5["deaths"] = str(matchstats["deaths"])
@@ -685,7 +642,7 @@ def getLatestMatchVG(name, server, game, auto):
                     player6["karmaLevel"] = str(matchstats["karmaLevel"])
                     player6["skillTier"] = str(matchstats["skillTier"])
 
-                    player6["actor"] = str(pretty(participant.actor))
+                    player6["actor"] = str(pretty(participant.actor).replace("*", ""))
                     player6["kills"] = str(matchstats["kills"])
                     player6["assists"] = str(matchstats["assists"])
                     player6["deaths"] = str(matchstats["deaths"])
@@ -702,28 +659,28 @@ def getLatestMatchVG(name, server, game, auto):
     # print(str(player6) + " | player6")
 
     # Create STRING for TEAMA
-    teamAString = "**Kills:** *" + str(heroKillsA) + "* **| Deaths:** *" + str(heroKillsB) + "* **| Aces:** *" + str(acesEarnedA) + "* **| Kraken Captures:** *" + str(krakenCapturesA) + "* **| Gold:** *" + str(goldA) + "* **| Turrets Destroyed:** *" + str(turretKillsA) + "* **| Turrets Left:**" + str(turretsRemainingA) + "*"
+    teamAString = "**Kills:** *" + str(heroKillsA) + "* **| Deaths:** *" + str(heroKillsB) + "* **| Aces:** *" + str(acesEarnedA) + "* **| Kraken Captures:** *" + str(krakenCapturesA) + "* **| Gold:** *" + str(goldA) + "* **| Turrets Destroyed:** *" + str(turretKillsA) + "* **| Turrets Left:** *" + str(turretsRemainingA) + "*"
 
     # Create STRING for PLAYER1
-    player1String = "\n\n**Player:** *" + str(player1["name"]) + "* **| Lv:** *" + str(player1["level"]) + "* **ST:** *" + str(VG_toolbox.giveSkillTierVG(player1["skillTier"])) + "* **K:** *" + str(VG_toolbox.giveKarmaVG(player1["karmaLevel"])) + "*\n**Actor:** *" + str(player1["actor"]) + "* **| Kills:** *" + str(player1["kills"]) + "* **| Assists:** *" + player1["assists"] + "* **| Deaths:** *" + player1["deaths"] + "* **| Grind:** *" + player1["farm"] + "*"
+    player1String = "\n\n**Player:** *" + str(player1["name"]) + "* **| Lv:** *" + str(player1["level"]) + "* **| ST:** *" + str(VG_toolbox.giveSkillTierVG(player1["skillTier"])) + "* **| K:** *" + str(VG_toolbox.giveKarmaVG(player1["karmaLevel"])) + "*\n**Actor:** *" + str(player1["actor"]) + "* **| Kills:** *" + str(player1["kills"]) + "* **| Assists:** *" + player1["assists"] + "* **| Deaths:** *" + player1["deaths"] + "* **| Grind:** *" + player1["farm"] + "*"
 
     # Create STRING for PLAYER2
-    player2String = "\n\n**Player:** *" + str(player2["name"]) + "* **| Lv:** *" + str(player2["level"]) + "* **ST:** *" + str(VG_toolbox.giveSkillTierVG(player2["skillTier"])) + "* **K:** *" + str(VG_toolbox.giveKarmaVG(player2["karmaLevel"])) + "*\n**Actor:** *" + str(player2["actor"]) + "* **| Kills:** *" + str(player2["kills"]) + "* **| Assists:** *" + player2["assists"] + "* **| Deaths:** *" + player2["deaths"] + "* **| Grind:** *" + player2["farm"] + "*"
+    player2String = "\n\n**Player:** *" + str(player2["name"]) + "* **| Lv:** *" + str(player2["level"]) + "* **| ST:** *" + str(VG_toolbox.giveSkillTierVG(player2["skillTier"])) + "* **| K:** *" + str(VG_toolbox.giveKarmaVG(player2["karmaLevel"])) + "*\n**Actor:** *" + str(player2["actor"]) + "* **| Kills:** *" + str(player2["kills"]) + "* **| Assists:** *" + player2["assists"] + "* **| Deaths:** *" + player2["deaths"] + "* **| Grind:** *" + player2["farm"] + "*"
 
     # Create STRING for PLAYER3
-    player3String = "\n\n**Player:** *" + str(player3["name"]) + "* **| Lv:** *" + str(player3["level"]) + "* **ST:** *" + str(VG_toolbox.giveSkillTierVG(player3["skillTier"])) + "* **K:** *" + str(VG_toolbox.giveKarmaVG(player3["karmaLevel"])) + "*\n**Actor:** *" + str(player3["actor"]) + "* **| Kills:** *" + str(player3["kills"]) + "* **| Assists:** *" + player3["assists"] + "* **| Deaths:** *" + player3["deaths"] + "* **| Grind:** *" + player3["farm"] + "*"
+    player3String = "\n\n**Player:** *" + str(player3["name"]) + "* **| Lv:** *" + str(player3["level"]) + "* **| ST:** *" + str(VG_toolbox.giveSkillTierVG(player3["skillTier"])) + "* **| K:** *" + str(VG_toolbox.giveKarmaVG(player3["karmaLevel"])) + "*\n**Actor:** *" + str(player3["actor"]) + "* **| Kills:** *" + str(player3["kills"]) + "* **| Assists:** *" + player3["assists"] + "* **| Deaths:** *" + player3["deaths"] + "* **| Grind:** *" + player3["farm"] + "*"
 
     # Create STRING for TEAMB
-    teamBString = "**Kills:** *" + str(heroKillsB) + "* **| Deaths:** *" + str(heroKillsA) + "* **| Aces:** *" + str(acesEarnedB) + "* **| Kraken Captures:** *" + str(krakenCapturesB) + "* **| Gold:** *" + str(goldB) + "* **| Turrets Destroyed:** *" + str(turretKillsB) + "* **| Turrets Left:**" + str(turretsRemainingB) + "*"
+    teamBString = "**Kills:** *" + str(heroKillsB) + "* **| Deaths:** *" + str(heroKillsA) + "* **| Aces:** *" + str(acesEarnedB) + "* **| Kraken Captures:** *" + str(krakenCapturesB) + "* **| Gold:** *" + str(goldB) + "* **| Turrets Destroyed:** *" + str(turretKillsB) + "* **| Turrets Left:** *" + str(turretsRemainingB) + "*"
 
     # Create STRING for PLAYER4
-    player4String = "\n\n**Player:** *" + str(player4["name"]) + "* **| Lv:** *" + str(player4["level"]) + "* **ST:** *" + str(VG_toolbox.giveSkillTierVG(player4["skillTier"])) + "* **K:** *" + str(VG_toolbox.giveKarmaVG(player4["karmaLevel"])) + "*\n**Actor:** *" + str(player4["actor"]) + "* **| Kills:** *" + str(player4["kills"]) + "* **| Assists:** *" + player4["assists"] + "* **| Deaths:** *" + player4["deaths"] + "* **| Grind:** *" + player4["farm"] + "*"
+    player4String = "\n\n**Player:** *" + str(player4["name"]) + "* **| Lv:** *" + str(player4["level"]) + "* **| ST:** *" + str(VG_toolbox.giveSkillTierVG(player4["skillTier"])) + "* **| K:** *" + str(VG_toolbox.giveKarmaVG(player4["karmaLevel"])) + "*\n**Actor:** *" + str(player4["actor"]) + "* **| Kills:** *" + str(player4["kills"]) + "* **| Assists:** *" + player4["assists"] + "* **| Deaths:** *" + player4["deaths"] + "* **| Grind:** *" + player4["farm"] + "*"
 
     # Create STRING for PLAYER5
-    player5String = "\n\n**Player:** *" + str(player5["name"]) + "* **| Lv:** *" + str(player5["level"]) + "* **ST:** *" + str(VG_toolbox.giveSkillTierVG(player5["skillTier"])) + "* **K:** *" + str(VG_toolbox.giveKarmaVG(player5["karmaLevel"])) + "*\n**Actor:** *" + str(player5["actor"]) + "* **| Kills:** *" + str(player5["kills"]) + "* **| Assists:** *" + player5["assists"] + "* **| Deaths:** *" + player5["deaths"] + "* **| Grind:** *" + player5["farm"] + "*"
+    player5String = "\n\n**Player:** *" + str(player5["name"]) + "* **| Lv:** *" + str(player5["level"]) + "* **| ST:** *" + str(VG_toolbox.giveSkillTierVG(player5["skillTier"])) + "* **| K:** *" + str(VG_toolbox.giveKarmaVG(player5["karmaLevel"])) + "*\n**Actor:** *" + str(player5["actor"]) + "* **| Kills:** *" + str(player5["kills"]) + "* **| Assists:** *" + player5["assists"] + "* **| Deaths:** *" + player5["deaths"] + "* **| Grind:** *" + player5["farm"] + "*"
 
     # Create STRING for PLAYER6
-    player6String = "\n\n**Player:** *" + str(player6["name"]) + "* **| Lv:** *" + str(player6["level"]) + "* **ST:** *" + str(VG_toolbox.giveSkillTierVG(player6["skillTier"])) + "* **K:** *" + str(VG_toolbox.giveKarmaVG(player6["karmaLevel"])) + "*\n**Actor:** *" + str(player6["actor"]) + "* **| Kills:** *" + str(player6["kills"]) + "* **| Assists:** *" + player6["assists"] + "* **| Deaths:** *" + player6["deaths"] + "* **| Grind:** *" + player6["farm"] + "*"
+    player6String = "\n\n**Player:** *" + str(player6["name"]) + "* **| Lv:** *" + str(player6["level"]) + "* **| ST:** *" + str(VG_toolbox.giveSkillTierVG(player6["skillTier"])) + "* **| K:** *" + str(VG_toolbox.giveKarmaVG(player6["karmaLevel"])) + "*\n**Actor:** *" + str(player6["actor"]) + "* **| Kills:** *" + str(player6["kills"]) + "* **| Assists:** *" + player6["assists"] + "* **| Deaths:** *" + player6["deaths"] + "* **| Grind:** *" + player6["farm"] + "*"
 
     # Create the TITLE for EMBED
     title = "Latest match from " + str(name) + " in the past 31 days | Game Type: " + str(VG_toolbox.giveMatchVG(gameMode)) + " | Date: " + str(latestmatch)

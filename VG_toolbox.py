@@ -38,25 +38,22 @@ def giveMatchVG(match, mode=0):
     match = str(match)  # Convert MATCH to STRING to prevent ERRORS
     
     match_dict = {
-     "blitz_pvp_ranked": "Blitz",
-     "casual_aral": "Battle Royale",
-     "private": "Private Casual",
-     "private_party_draft_match": "Private Draft",
-     "private_party_blitz_match": "Private Blitz",
-     "private_party_aral_match":"Private Battle Royale",
-     "casual": "Casual Match",
-     "ranked": "Rank Match",
-    }
+                 "blitz_pvp_ranked": "Blitz",
+                 "casual_aral": "Battle Royal",
+                 "private": "Private Casual",
+                 "private_party_draft_match": "Private Draft",
+                 "private_party_blitz_match": "Private Blitz",
+                 "private_party_aral_match": "Private Battle Royal",
+                 "casual": "Casual Match",
+                 "ranked": "Rank Match"
+                 }
      
     reverse_match = {
-    "casual": "casual",
-    "blitz": "blitz_pvp_ranked",
-    "royale": "casual_aral",
-    "rank": "ranked",
-    "ranked": "ranked",
-    "br": "casual_aral",
-    "battle": "casual_aral"
-    }
+                    "casual": "casual",
+                    "blitz": "blitz_pvp_ranked",
+                    "royale": "casual_aral",
+                    "rank": "ranked"
+                    }
     if mode == 0:
         try:
             return match_dict[match]
@@ -119,11 +116,11 @@ def giveSkillTierVG(tier, mode=0):
     return skill_dict[tier][mode]
 
 # Will check that MODE is VALID
-def isGameModeVG(mode, type=0):
-    if tools.isIntTOOL(mode) == True:
+def isGameModeVG(game_mode, type=0):
+    if tools.isIntTOOL(game_mode) == True:
         return False
 
-    mode = str(mode)  # Convert MODE to STRING to prevent ERRORS
+    game_mode = str(game_mode)  # Convert MODE to STRING to prevent ERRORS
 
     modes = [
         "any",
@@ -132,8 +129,9 @@ def isGameModeVG(mode, type=0):
         "blitz",
         "royale"
         ]
-    if mode in modes:
+    if game_mode in modes:
         return True
+
     else:
         return False
 
@@ -159,4 +157,3 @@ def isServerVG(server):
 
     else:
         return False
-      

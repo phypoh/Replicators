@@ -11,6 +11,7 @@ bot
 
 # IMPORTS
 from discord.ext import commands
+import config
 import main
 
 # BOT VARIABLES
@@ -95,6 +96,33 @@ class Bot():
 
         await self.bot.say("Hi, I'm *" + str(nameBOT) + "*, and I've been developed in Python and have grown with lots of love. You can see a list of our commands with the **help** command!")
 
+    # Used to CHANGE the PREFIX
+    @commands.command(pass_context=True)
+    async def prefix(self, raw, prefix=""):
+        """Used to change server's prefix.
+
+                >prefix (new_prefix)
+            new_prefix   ~   Any combinations of character that isn't separated with space
+
+            Example:
+                >prefix Ezl1!
+        """
+
+        prefix = str(prefix)  # CONVERT PREFIX to STRING to prevent ERRORS
+
+        if prefix == "":
+            await self.bot.say("You need to give a **prefix**... :sweat_smile:")
+            return
+
+        if not raw.message.author.permissions_in(raw.message.channel).administrator:
+            await self.bot.say('Sorry, but you have to be an **admin** to change the prefix.')
+            return
+
+        config.serverprefixes[raw.message.server.id] = prefix
+
+        await self.bot.say("**prefixed changed to " + str(
+            prefix) + "**\nPlease don't forget your new prefix.\nWant me good as new? Just kick me out of the server and reinvite me.")
+        main.storePrefix()
 
 def setup(bot):
     bot.add_cog(Bot(bot))

@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+import config
 import pickle
 
 keyBot = ""
@@ -9,18 +10,27 @@ descriptionBOT = "EZLBot is a bot created for Discord to utilize the VG api!"
 bot = commands.Bot(command_prefix='$', description=descriptionBOT)
 
 OWNERS = ['198255568882761728', '164026892796690433', '102704301956149248', '139537219793715200']  # When you want to AUTHENTICATE the AUTHOR
-serverprefixes = {}  # DICTIONARY of all SERVERS PREFIX
 
 # Loads serverprefixes dict from the pickle file
 try:
     with open('prefixes.pickle', 'rb') as handle:
-        serverprefixes = pickle.load(handle)
+        config.serverprefixes = pickle.load(handle)
 
     # FOR DEBUGGING
-    print(str(serverprefixes) + "   |   LOADED PREFIXES")
+    print(str(config.serverprefixes) + "   |   LOADED PREFIXES")
 
 except:
     print("No Prefixes Yet")
+
+try:
+    with open('playersVGQ.pickle', 'rb') as handle:
+        config.playersVGQ = pickle.load(handle)
+
+    # FOR DEBUGGING
+    print(str(config.playersVGQ) + "   |   LOADED PLAYERVGQ")
+
+except:
+    print("No VGQ Yet")
 
 # Do when the BOT is ready to RUN
 @bot.event
@@ -33,60 +43,32 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     # FOR DEBUGGING
-    # print(str(serverprefixes) + "   |   REAL TIME PREFIXES")
+    # print(str(config.serverprefixes) + "   |   REAL TIME PREFIXES")
 
-    pr = serverprefixes.get(message.server.id, '$')
-    bot.command_prefix = [pr]
+    prefix = config.serverprefixes.get(message.server.id, '$')  # Get the PREFIX for SERVER
+    bot.command_prefix = [prefix]
     await bot.process_commands(message)
-
-# Used to CHANGE the PREFIX
-@bot.command(pass_context=True)
-async def prefix(raw, prefix=""):
-    """Used to change server's prefix.
-
-            >prefix (new_prefix)
-
-        new_prefix   ~   Any combinations of character that isn't separated with space
-
-        Example:
-            >prefix Ezl1!
-
-    """
-
-    prefix = str(prefix)  # CONVERT PREFIX to STRING to prevent ERRORS
-
-    if prefix == "":
-        await bot.say("You need to give a **prefix**... :sweat_smile:")
-        return
-
-    if not raw.message.author.permissions_in(raw.message.channel).administrator:
-        await bot.say('Sorry, but you have to be an **admin** to change the prefix.')
-        return
-
-    serverprefixes[raw.message.server.id] = prefix
-
-    await bot.say("**prefixed changed to " + str(prefix) + "**\nPlease don't forget your new prefix.\nWant me good as new? Just kick me out of the server and reinvite me.")
-    storePrefix()
 
 
 # STORE PREFIXES into SERVERPREFIXES
 def storePrefix():
     # Store data (serialize)
     with open('prefixes.pickle', 'wb') as handle:
-        pickle.dump(serverprefixes, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(config.serverprefixes, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     # FOR DEBUGGING
-    # print(str(serverprefixes) + "   |   AFTER STORING")
+    # print(str(config.serverprefixes) + "   |   AFTER STORING")
+
 
 # REMOVES PREFIX ON SERVER REMOVAL
 @bot.event
 async def on_server_remove(server):
-    serverprefixes.pop(server.id, None)
+    config.serverprefixes.pop(server.id, None)
     storePrefix()
 
 
     # FOR DEBUGGING
-    # print(serverprefixes)
+    # print(config.serverprefixes)
 
 
 # Group of commands for BOT DEVELOPERS
@@ -94,6 +76,7 @@ async def on_server_remove(server):
 async def owner(ctx):
     """ONLY FOR BOT OWNERS"""
     pass
+
 
 @owner.command(pass_context=True, hidden=True)
 async def load(raw, module: str):
@@ -104,7 +87,6 @@ async def load(raw, module: str):
     await bot.say("K")
 
 
-
 @owner.command(pass_context=True, hidden=True)
 async def unload(raw, module: str):
     if raw.message.author.id not in OWNERS:
@@ -113,7 +95,8 @@ async def unload(raw, module: str):
     bot.unload_extension(module)
     await bot.say("K")
 
-@owner.command(pass_context = True, hidden=True)
+
+@owner.command(pass_context=True, hidden=True)
 async def reload(ctx, module: str):
     if ctx.message.author.id not in OWNERS:
         return
