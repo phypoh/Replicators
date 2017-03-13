@@ -145,7 +145,7 @@ def getMatchesVG(amount=50, name="", server="na", game_mode="any", days=31, auto
 
     else:
         print("!!!HUGE ERROR WHILE TRYING TO GET MATCHES!!!")
-        return "!!!HUGE ERROR WHILE TRYING TO GET MATCHES!!!""
+        return "!!!HUGE ERROR WHILE TRYING TO GET MATCHES!!!"
     matches = sorted(matches, key=lambda d: d.createdAt, reverse =True)
     return matches
 
