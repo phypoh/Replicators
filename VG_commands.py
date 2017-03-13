@@ -18,10 +18,11 @@ import VG_toolbox
 import config
 import pickle
 from VG_module import getMatches, apiVG
+import dateutil.parser,asyncio
 
 # DISCORD EMBED VARIABLES--
 botImageDISCORD = "http://i63.tinypic.com/9k6xcj.jpg"  # URL of BOTS IMAGE
-signatureDISCORD = "Big Thanks to SEMC and MadGlory! Made with love ~ xoxo"  # String used in FOOTER as MESSAGE
+signatureDISCORD = "Big Thanks to SEMC and MadGlory! Made with love."  # String used in FOOTER as MESSAGE
 msgs = dict()
 
 # Stores PLAYERVGQ DICT
