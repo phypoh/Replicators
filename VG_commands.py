@@ -535,9 +535,9 @@ class Vg():
                 return
             else:
                 ign = data["IGN"]
-                region = data['region']
+                region = data['Region']
         gamemode = gamemode.lower()
-        gamemode = reverse_match.get(gamemode, '')
+        gamemode = VG_module.reverse_match.get(gamemode, '')
         region = region.lower()
         msg = await self.bot.say("Fetching data for {}.".format(ign))
         try:
