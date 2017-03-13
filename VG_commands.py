@@ -72,7 +72,7 @@ def giveDays(date):
     date = int(date)  # Convert DATE to INT to prevent ERRORS
 
     if date <= 0:
-        return 3
+        return 1
 
     elif date > 93:
         return 93
@@ -182,14 +182,14 @@ class Vg():
         self.bot = bot
 
     @commands.command(pass_context=True)
-    async def stats(self, raw, player_name="", server="na", game_mode="any", days="7", auto="False"):
+    async def stats(self, raw, player_name="", server="na", game_mode="any", days="31", auto="False"):
         """Gets a players performance in the past days.
 
                 >stats (player_name) (server) (game_mode) (days)
             player_name   ~   name of player to search for
             server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sea or sg, ea, sa
             game_mode     ~   game mode you would like performance check   ~   default: any, options: any, casual, ranked, royale, blitz
-            days          ~   day range to search from                     ~   default: 7, requirements: maximum: 93, minimum: 1
+            days          ~   day range to search from                     ~   default: 31, requirements: maximum: 93, minimum: 1
             
             example:
                 >stats player1 na casual 7
@@ -200,7 +200,7 @@ class Vg():
         # FALSE = WILL ONLY CHECK GIVEN SERVER, TRUE = WILL CHECK ALL SERVERS UNTIL FINDING PLAYER
 
         # Checks if NOTHING was GIVEN
-        if player_name == "" and server == "na" and game_mode == "any" and days == "7" and auto == "False":
+        if player_name == "" and server == "na" and game_mode == "any" and days == "31" and auto == "False":
 
             discordID = raw.message.author.id
 
@@ -417,6 +417,7 @@ class Vg():
 
         if checkName(player_name) == False:
             await self.bot.say("No valid player name was given... :sweat_smile:")
+            return
 
         server = giveServer(server)
 

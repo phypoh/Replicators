@@ -62,10 +62,7 @@ class Bot():
         if command == "servers":
             msg = await self.bot.say("Running " + str(command) + "... :eyes:")
 
-            notice = "I'm in **" + str(len(self.bot.servers)) + "** servers total!\nNames are the Following:\n"
-
-            for server in self.bot.servers:
-                notice += str(server.name) + ", "
+            notice = "I'm in **" + str(len(self.bot.servers)) + "** servers total!"
 
             await self.bot.edit_message(msg, notice)
 
@@ -77,8 +74,15 @@ class Bot():
             # print(msg)
 
             for server in self.bot.servers:
-                await self.bot.send_message(server.default_channel, msg[1])
+                try:
+                    await self.bot.send_message(server.default_channel, msg[1])
 
+                except:
+                    try:
+                        print("Couldn't send notice to:   " + str(server.name))
+
+                    except:
+                        pass
         else:
             try:
                 await self.bot.say(str(command) + " isn't a valid extension command... :sweat_smile:")
