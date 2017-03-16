@@ -17,7 +17,7 @@ try:
         config.serverprefixes = pickle.load(handle)
 
     # FOR DEBUGGING
-    print(str(config.serverprefixes) + "   |   LOADED PREFIXES")
+    # print(str(config.serverprefixes) + "   |   LOADED PREFIXES")
 
 except:
     print("No Prefixes Yet")
@@ -27,7 +27,7 @@ try:
         config.playersVGQ = pickle.load(handle)
 
     # FOR DEBUGGING
-    print(str(config.playersVGQ) + "   |   LOADED PLAYERVGQ")
+    # print(str(config.playersVGQ) + "   |   LOADED PLAYERVGQ")
 
 except:
     print("No VGQ Yet")

@@ -10,13 +10,12 @@ List of Functions:
 """
 
 import gamelocker
-from gamelocker.strings import pretty
+import gamelocker.strings
 import datetime
 import discord
 import TOOL_module as tools
 import dateutil.parser
 import VG_toolbox
-from VG_toolbox import giveMatchVG
 
 
 # VG Variables--
@@ -59,28 +58,8 @@ heroes = {
         "*Sayoc*": "Taka",
         "*Skye*": "Skye",
         "*Vox*": "Vox"
-    }
-match_dict = {
-"blitz_pvp_ranked": "Blitz",
-"casual_aral": "Battle Royale",
-"private": "Private Casual",
-"private_party_draft_match": "Private Draft",
-"private_party_blitz_match": "Private Blitz",
-"private_party_aral_match":"Private Battle Royale",
-"casual": "Casual Match",
-"ranked": "Rank Match"
-}
+         }
 
-reverse_match = {
-"casual": "casual",
-"blitz": "blitz_pvp_ranked",
-"royale": "casual_aral",
-"rank": "ranked",
-"rank": "ranked",
-"ranked": "ranked",
-"br": "casual_aral",
-"battle": "casual_aral"
-}
 
 # GETS MATCH OBJECTS and RETURNS INFO
 def getMatchesVG(amount=50, name="", server="na", game_mode="any", days=31, auto=False):
@@ -102,11 +81,14 @@ def getMatchesVG(amount=50, name="", server="na", game_mode="any", days=31, auto
     # BUILD FILTER used to GET MATCHES
     filterVG = {'filter[createdAt-start]': daterange, 'page[limit]': amount, 'filter[playerNames]': name, "sort": "-createdAt"}
 
+    # FOR DEBUGGING
+    # print(filterVG)
+
     if game_mode == "any" or game_mode == "":
         pass
 
     else:
-        filterVG["filter[gameMode]"] = giveMatchVG(game_mode, 1)
+        filterVG["filter[gameMode]"] = VG_toolbox.giveMatchVG(game_mode, 1)
 
     # FOR DEBUGGING
     # print(str(filterVG) + "   |   FILTER USED")
@@ -146,7 +128,8 @@ def getMatchesVG(amount=50, name="", server="na", game_mode="any", days=31, auto
     else:
         print("!!!HUGE ERROR WHILE TRYING TO GET MATCHES!!!")
         return "!!!HUGE ERROR WHILE TRYING TO GET MATCHES!!!"
-    matches = sorted(matches, key=lambda d: d.createdAt, reverse =True)
+
+    matches = sorted(matches, key=lambda d: d.createdAt, reverse=True)
     return matches
 
 
@@ -271,14 +254,13 @@ def getPlayerPerformanceVG(name, server="", game_mode="", days=7, auto=False):
     if matches == False:
         msg = "Couldn't find"
 
-        if game_mode != "":
+        if game_mode != "" and game_mode != "any":
             msg += " any **" + str(game_mode) + "** matches"
 
         else:
             msg += " anything"
 
-        msg += " of **" + str(name) + "** in the past **" + str(days) + "** days in **" + str(
-            server) + "** server!"
+        msg += " of **" + str(name) + "** in the past **" + str(days) + "** days in **" + str(server) + "** server!"
 
         return msg
 
@@ -336,7 +318,7 @@ def getPlayerPerformanceVG(name, server="", game_mode="", days=7, auto=False):
         attributes = data["attributes"]
         stats = attributes["stats"]
 
-        actor.append(pretty(attributes["actor"]).replace("*", ""))
+        actor.append(gamelocker.strings.pretty(attributes["actor"]).replace("*", ""))
         assists.append(stats["assists"])
         crystalMineCaptures.append(stats["crystalMineCaptures"])
         deaths.append(stats["deaths"])
@@ -344,12 +326,12 @@ def getPlayerPerformanceVG(name, server="", game_mode="", days=7, auto=False):
         goldMineCaptures.append(stats["goldMineCaptures"])
 
         for item in stats["items"]:  # LOOPS the ITEMS for EACH MATCH ADDING it to the ITEMSLIST
-            itemslist.append(pretty(item))
+            itemslist.append(gamelocker.strings.pretty(item))
 
         kills.append(stats["kills"])
         krakenCaptures.append(stats["krakenCaptures"])
         minionKills.append(stats["minionKills"])
-        skinKey.append(pretty(stats["skinKey"]))
+        skinKey.append(gamelocker.strings.pretty(stats["skinKey"]))
         turretCaptures.append(stats["turretCaptures"])
         wentAfk.append(stats["wentAfk"])
         winner.append(stats["winner"])
@@ -384,7 +366,7 @@ def getPlayerPerformanceVG(name, server="", game_mode="", days=7, auto=False):
     if len(gamemodes) <= 0:  # If NO GAMEMODES were FOUND then NOTICE USER about it
         gamemodelistString = "\n**We couldn't get any game modes from your matches!**"
 
-    elif game_mode != "":
+    elif game_mode != "" and game_mode != "any":
         gamemodelistString = "\n**This is performance from " + str(game_mode) + " games only...**"
 
     else:
@@ -531,6 +513,7 @@ def getPlayerPerformanceVG(name, server="", game_mode="", days=7, auto=False):
     # Set the THUMBNAIL to MOST USED HERO
     try:
         embed.set_thumbnail(url=thumbnail)
+
     except:  # If THUMBNAIL couldn't be REACHED then MAKE THUMBNAIL the Vainglory logo
         embed.set_thumbnail(url="http://i63.tinypic.com/9k6xcj.jpg")
 
@@ -634,7 +617,7 @@ def getLatestMatchVG(name, server="na", game_mode="", auto=False):
                     player1["karmaLevel"] = str(matchstats["karmaLevel"])
                     player1["skillTier"] = str(matchstats["skillTier"])
 
-                    player1["actor"] = str(pretty(participant.actor).replace("*", ""))
+                    player1["actor"] = str(gamelocker.strings.pretty(participant.actor).replace("*", ""))
                     player1["kills"] = str(matchstats["kills"])
                     player1["assists"] = str(matchstats["assists"])
                     player1["deaths"] = str(matchstats["deaths"])
@@ -646,7 +629,7 @@ def getLatestMatchVG(name, server="na", game_mode="", auto=False):
                     player2["karmaLevel"] = str(matchstats["karmaLevel"])
                     player2["skillTier"] = str(matchstats["skillTier"])
 
-                    player2["actor"] = str(pretty(participant.actor).replace("*", ""))
+                    player2["actor"] = str(gamelocker.strings.pretty(participant.actor).replace("*", ""))
                     player2["kills"] = str(matchstats["kills"])
                     player2["assists"] = str(matchstats["assists"])
                     player2["deaths"] = str(matchstats["deaths"])
@@ -658,7 +641,7 @@ def getLatestMatchVG(name, server="na", game_mode="", auto=False):
                     player3["karmaLevel"] = str(matchstats["karmaLevel"])
                     player3["skillTier"] = str(matchstats["skillTier"])
 
-                    player3["actor"] = str(pretty(participant.actor).replace("*", ""))
+                    player3["actor"] = str(gamelocker.strings.pretty(participant.actor).replace("*", ""))
                     player3["kills"] = str(matchstats["kills"])
                     player3["assists"] = str(matchstats["assists"])
                     player3["deaths"] = str(matchstats["deaths"])
@@ -673,7 +656,7 @@ def getLatestMatchVG(name, server="na", game_mode="", auto=False):
                     player4["karmaLevel"] = str(matchstats["karmaLevel"])
                     player4["skillTier"] = str(matchstats["skillTier"])
 
-                    player4["actor"] = str(pretty(participant.actor).replace("*", ""))
+                    player4["actor"] = str(gamelocker.strings.pretty(participant.actor).replace("*", ""))
                     player4["kills"] = str(matchstats["kills"])
                     player4["assists"] = str(matchstats["assists"])
                     player4["deaths"] = str(matchstats["deaths"])
@@ -685,7 +668,7 @@ def getLatestMatchVG(name, server="na", game_mode="", auto=False):
                     player5["karmaLevel"] = str(matchstats["karmaLevel"])
                     player5["skillTier"] = str(matchstats["skillTier"])
 
-                    player5["actor"] = str(pretty(participant.actor).replace("*", ""))
+                    player5["actor"] = str(gamelocker.strings.pretty(participant.actor).replace("*", ""))
                     player5["kills"] = str(matchstats["kills"])
                     player5["assists"] = str(matchstats["assists"])
                     player5["deaths"] = str(matchstats["deaths"])
@@ -697,7 +680,7 @@ def getLatestMatchVG(name, server="na", game_mode="", auto=False):
                     player6["karmaLevel"] = str(matchstats["karmaLevel"])
                     player6["skillTier"] = str(matchstats["skillTier"])
 
-                    player6["actor"] = str(pretty(participant.actor).replace("*", ""))
+                    player6["actor"] = str(gamelocker.strings.pretty(participant.actor).replace("*", ""))
                     player6["kills"] = str(matchstats["kills"])
                     player6["assists"] = str(matchstats["assists"])
                     player6["deaths"] = str(matchstats["deaths"])
@@ -773,35 +756,41 @@ def getLatestMatchVG(name, server="na", game_mode="", auto=False):
     # SEND the EMBED
     return embed
 
-def getMatches(ign, m, region='na',page =1, num =1):
+
+# Makes an EMBED of MATCHES to SORT THROUGH
+def getEmbedMatchesVG(name, match, game_mode, page, pages):
     t1_tier = 0
     t2_tier = 0
-    t1 = m.rosters[0]
-    t2 = m.rosters[1]
+    t1 = match.rosters[0]
+    t2 = match.rosters[1]
     t1_participants = ''
     t2_participants = ''
-    duration  = format((m.duration // 60) + ((m.duration % 60) /100), '.2f')
-    duration = duration.replace('.', ':')
-    for i in m.rosters[0].participants:
-        i.actor = heroes.get(i.actor, i.actor)
-        i.actor = (i.actor).replace('*','')
-        if i.player.name == ign:
-            player = i
-        t1_tier += i.stats['skillTier']
-    for i in m.rosters[1].participants:
-        i.actor = heroes.get(i.actor, i.actor)
-        i.actor = (i.actor).replace('*','')
-        if i.player.name == ign:
-            t1_tier,t2_tier = t2_tier,t1_tier
-            t1,t2 = t2,t1
-            player = i
-        t2_tier += i.stats['skillTier']
 
-    gamemode = match_dict.get(m.gameMode, m.gameMode)
+    # GET MATCH TIME
+    duration = format((match.duration // 60) + ((match.duration % 60) / 100), '.2f')
+    duration = duration.replace('.', ':')
+
+    for participant in match.rosters[0].participants:
+        participant.actor = heroes.get(participant.actor, participant.actor)
+        participant.actor = (participant.actor).replace('*', '')
+        if participant.player.name == name:
+            player = participant
+        t1_tier += participant.stats['skillTier']
+
+    for participant in match.rosters[1].participants:
+        participant.actor = heroes.get(participant.actor, participant.actor)
+        participant.actor = (participant.actor).replace('*', '')
+        if participant.player.name == name:
+            t1_tier, t2_tier = t2_tier, t1_tier
+            t1, t2 = t2, t1
+            player = participant
+        t2_tier += participant.stats['skillTier']
+
     if t1.participants[0].stats['winner']:
         result = 'Victory'
         resultcolor = 0x2fe26e
         thumburl = 'https://s2.postimg.org/barjsw3e1/victory.png'
+
     else:
         result = 'Defeat'
         resultcolor = 0xe22f2f
@@ -810,21 +799,51 @@ def getMatches(ign, m, region='na',page =1, num =1):
     if t1.stats['side'] == 'left/blue':
         t1_color = "Blue:"
         t2_color = "Orange:"
+
     else:
         t1_color = "Orange:"
         t2_color = "Blue:"
-    for i in t1.participants:
-        t1_participants += '**{}** | {} | {}/{}/{}\n'.format(i.player.name, i.actor, i.stats['kills'], i.stats['deaths'], i.stats['assists'])
-    for i in t2.participants:
-        t2_participants += '**{}** | {} | {}/{}/{}\n'.format(i.player.name, i.actor, i.stats['kills'], i.stats['deaths'], i.stats['assists'])
-    details = "{} Kills {} | {} Turrets {} | {} Krakens {} | {} Aces {} | {} Gold {}".format(str(t1.stats['heroKills']), str(t2.stats['heroKills']), str(t1.stats['turretsRemaining']), str(t2.stats['turretsRemaining']), str(t1.stats['krakenCaptures']),str( t2.stats['krakenCaptures']), str(t1.stats['acesEarned']), str(t2.stats['acesEarned']), str(t1.stats['gold']), str(t2.stats['gold']))
-    winchance = str(int(round(100 * (t1_tier/ (t1_tier+t2_tier)), 0)))
-    krakens = str(m.rosters[0].stats['krakenCaptures'] + m.rosters[1].stats['krakenCaptures'])
-    em = discord.Embed(title=result +' | '+ gamemode, description= '{} Minutes Long.\n{} Krakens Taken.\nVictory Chance: {}%'.format(duration, krakens, winchance) , colour=resultcolor, url = "http://ezlgg.com", timestamp = dateutil.parser.parse(m.createdAt).replace(tzinfo=None))
-    em.add_field(name = t1_color, value = t1_participants)
-    em.add_field(name = t2_color, value = t2_participants)
-    em.add_field(name = "Details:", value = details, inline = False)
-    em.set_author(name=ign, icon_url="http://www.vaingloryfire.com/images/wikibase/icon/heroes/"+player.actor+".png", url = 'http://www.vaingloryfire.com/vainglory/wiki/heroes/'+player.actor)
-    em.set_footer(text= ign+' | Page {}/{}'.format(str(page),str(num)), icon_url= "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcREVEEL3vFm3boDZD0aSwSPFtZ2EXJGwiEjsnvXXTluLqXrD0mknNohwA")
-    em.set_thumbnail(url = thumburl)
-    return em
+
+    for participant in t1.participants:
+        t1_participants += '**{}** | {} | {}/{}/{}\n'.format(participant.player.name,
+        participant.actor, participant.stats['kills'], participant.stats['assists'], participant.stats['deaths'])
+
+    for participant in t2.participants:
+        t2_participants += '**{}** | {} | {}/{}/{}\n'.format(participant.player.name, participant.actor,
+        participant.stats['kills'], participant.stats['deaths'], participant.stats['assists'])
+
+    details = "{} **Kills** {} | {} **Turrets** {} | {} **Krakens** {} | {} **Aces** {} | {} **Gold** {}".format(
+
+        str(t1.stats['heroKills']), str(t2.stats['heroKills']), str(t1.stats['turretsRemaining']),
+        str(t2.stats['turretsRemaining']), str(t1.stats['krakenCaptures']), str(t2.stats['krakenCaptures']),
+        str(t1.stats['acesEarned']), str(t2.stats['acesEarned']), str(t1.stats['gold']), str(t2.stats['gold']))
+
+    winchance = str(int(round(100 * (t1_tier / (t1_tier + t2_tier)), 0)))
+    krakens = str(match.rosters[0].stats['krakenCaptures'] + match.rosters[1].stats['krakenCaptures'])
+
+    game_mode = VG_toolbox.giveMatchVG(match.gameMode)
+
+    # START EMBED
+    embed = discord.Embed(title=result + ' | ' + game_mode,
+                          description='**Game Time:** {}\n**Kraken Captures:** {}\n**Victory Chance:** {}%'.format(duration,
+                                                                                                     krakens,
+                                                                                                     winchance),
+                          colour=resultcolor, url="http://ezlgg.com",
+                          timestamp=dateutil.parser.parse(match.createdAt).replace(tzinfo=None))
+
+    embed.add_field(name=t1_color, value=t1_participants)
+
+    embed.add_field(name=t2_color, value=t2_participants)
+
+    embed.add_field(name="Details:", value=details, inline=False)
+
+    embed.set_author(name=name,
+                  icon_url="http://www.vaingloryfire.com/images/wikibase/icon/heroes/" + player.actor + ".png",
+                  url='http://www.vaingloryfire.com/vainglory/wiki/heroes/' + player.actor)
+
+    embed.set_footer(text=name + ' | Page {}/{}'.format(str(page), str(pages)),
+                  icon_url="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcREVEEL3vFm3boDZD0aSwSPFtZ2EXJGwiEjsnvXXTluLqXrD0mknNohwA")
+
+    embed.set_thumbnail(url=thumburl)
+
+    return embed
