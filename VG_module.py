@@ -313,10 +313,16 @@ def getPlayerPerformanceVG(name, server="", game_mode="", days=7, auto=False):
     wentAfk = []
     winner = []
 
+    num = 0
     # Go though PLAYERDATA getting DATA needed for building a PROFILE
     for data in playerdata:
         attributes = data["attributes"]
         stats = attributes["stats"]
+
+        if num == 0:
+            level = stats["level"]
+            karmaLevel = stats["karmaLevel"]
+            skillTier = stats["skillTier"]
 
         actor.append(gamelocker.strings.pretty(attributes["actor"]).replace("*", ""))
         assists.append(stats["assists"])
@@ -336,9 +342,7 @@ def getPlayerPerformanceVG(name, server="", game_mode="", days=7, auto=False):
         wentAfk.append(stats["wentAfk"])
         winner.append(stats["winner"])
 
-        level = stats["level"]
-        karmaLevel = stats["karmaLevel"]
-        skillTier = stats["skillTier"]
+        num += 1
 
     # FOR DEBUGGING
     # print(str(actor) + " | actors")

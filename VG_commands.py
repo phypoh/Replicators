@@ -538,7 +538,7 @@ class Vg():
             server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sea or sg, ea, sa
             game_mode     ~   game mode you would like performance check   ~   default: any, options: any, casual, ranked, royale, blitz
             days          ~   day range to search from                     ~   default: 31, options: maximum: 93, minimum: 1
-            pages         ~   number of matches to load                   ~   default: 25, range: maximum: 50, minimum: 1
+            pages         ~   number of matches to load                    ~   default: 25, range: maximum: 50, minimum: 1
 
             Example:
                 >matches player1 na casual 7 3
@@ -559,48 +559,9 @@ class Vg():
 
             else:
 
+                # FETCH PLAYER VGQ INFO
                 player_name = data["IGN"]
                 server = data["Region"]
-
-                # # NOTICE to be SENT
-                # notice = "Looking for **any** matches of **" + str(data["IGN"]) + "** from the past **31** days in the **" + str(data["Region"]) + "** region... :eyes:"
-                #
-                # # Sends NOTICE to CLIENT
-                # msg = await self.bot.say(notice)
-                #
-                # try:
-                #     # Await self.bot.edit_message(msg, embed=VG_module.getEmbedMatchesVG(player_name, server, game_mode, days, pages))
-                #     # Get MATCHES GIVEN INPUT
-                #     matches = VG_module.getMatchesVG(pages, data["IGN"], data["Region"], "any", days)
-                #
-                #     # SETUP REACTIONS
-                #     # Get emojis from http://www.fileformat.info/info/unicode/char/27a1/browsertest.html or by messaging R. Danny in discordpy server
-                #     await self.bot.add_reaction(msg, '\U00002b05')
-                #     await self.bot.add_reaction(msg, '\U000027a1')
-                #
-                # except:
-                #     await self.bot.edit_message(msg, "Couldn't get **any** matches for **" + str(data["IGN"]) + "** in the **" + str(data["Region"]) + "** region from the past **" + str(days) + "**... :sweat_smile:")
-                #     return
-                #
-                # # embed = VG_module.getEmbedMatchesVG(player_name, matches[0], game_mode, 1, pages)
-                #
-                # try:
-                #     await self.bot.edit_message(msg, embed=VG_module.getEmbedMatchesVG(player_name, matches[0], game_mode, 1, pages))
-                #
-                # except:
-                #     await self.bot.edit_message(msg, "Couldn't set up your matches... :pensive:")
-                #
-                # # STORE MESSAGE DATA
-                # msgs[msg.id] = {"IGN": player_name, 'Matches': matches, "Game_Mode": game_mode, 'PageNum': 0, 'Pages': pages}
-                #
-                # # Wait three minutes then try to delete the msg
-                # await asyncio.sleep(600)
-                # try:
-                #     del msgs[msg.id]
-                #     pass
-                #
-                # except:
-                #     pass
 
         # Checks that NAME given is VALID
         if checkName(player_name) == False:
@@ -633,6 +594,7 @@ class Vg():
             await self.bot.edit_message(msg, "Couldn't get **" + str(game_mode) + "** matches for **" + str(player_name) + "** in the **" + str(server) +"** region from the past **" + str(days) + "**... :sweat_smile:")
             return
 
+        # FETCH the EMBED
         embed = VG_module.getEmbedMatchesVG(player_name, matches[0], game_mode, 1, pages)
 
         try:
@@ -644,7 +606,7 @@ class Vg():
         # STORE MESSAGE DATA
         msgs[msg.id] = {"IGN": player_name, 'Matches': matches, "Game_Mode": game_mode, 'PageNum': 0, 'Pages': pages}
 
-        # Wait three minutes then try to delete the msg
+        # WAIT TEN MINUTES then TRY to DELETING the MSG
         await asyncio.sleep(600)
         try:
             del msgs[msg.id]
