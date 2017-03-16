@@ -188,9 +188,16 @@ def checkPages(pages):
 
 
 # GIVES VALID PAGES
-def givePages(pages):
+def givePages(pages, mode=0):
     if checkPages(pages) == False:
-        return False
+        if mode == 0:
+            return 25
+
+        elif mode == 1:
+            return 1
+
+        else:
+            return 1
 
     pages = int(pages)
 
@@ -216,7 +223,7 @@ class Vg():
 
     @commands.command(pass_context=True)
     async def stats(self, raw, player_name="", server="na", game_mode="any", days="31", auto="False"):
-        """Gets a players performance in the past days.
+        """Gets a players performance in the past days. Works with VGQ.
 
                 >stats (player_name) (server) (game_mode) (days)
             player_name   ~   name of player to search for
@@ -294,7 +301,7 @@ class Vg():
 
     @commands.command(pass_context=True)
     async def player(self, raw, player_name="", server="na", auto="False"):
-        """Checks if player exist in vainglory.
+        """Checks if player exist in vainglory. Works with VGQ.
 
                 >player (player_name) (server) (mode)
             player_name   ~   name of player to check for
@@ -365,7 +372,7 @@ class Vg():
 
     @commands.command(pass_context=True)
     async def latest(self, raw, player_name="", server="na", game_mode="any", auto="False"):
-        """Fetched the latest Vainglory match.
+        """Fetched the latest Vainglory match. Works with VGQ.
 
                 >latest (player_name) (server) (game_mode)
             player_name   ~   name of player to check for
@@ -530,14 +537,14 @@ class Vg():
 
     # Make an EMBED of MATCHES to SORT THROUGH
     @commands.command(pass_context=True)
-    async def matches(self, raw, player_name="", server="na", game_mode="any", days=31, pages=25):
-        """Reaction menu for all your matches! Works with VGQ.
+    async def matches(self, raw, player_name="", server="na", game_mode="any", page=1, pages=25):
+        """Reaction menu for matches, for when you want review multiple matches at once. Works with VGQ.
 
-                >matches (player_name) (server) (game_mode) (days) (pages)
+                >matches (player_name) (server) (game_mode) (page) (pages)
             player_name   ~   name of player to check for
             server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sea or sg, ea, sa
             game_mode     ~   game mode you would like performance check   ~   default: any, options: any, casual, ranked, royale, blitz
-            days          ~   day range to search from                     ~   default: 31, options: maximum: 93, minimum: 1
+            page          ~   page to start at                             ~   default: 1, options: maximum: 50, minimum: 1
             pages         ~   number of matches to load                    ~   default: 25, range: maximum: 50, minimum: 1
 
             Example:
@@ -545,7 +552,7 @@ class Vg():
 
         """
 
-        if player_name == "" and server == "na" and game_mode == "any" and days == 31 and pages == 25:
+        if player_name == "" and server == "na" and game_mode == "any" and page == 1 and pages == 25:
 
             # Get the AUTHORS ID
             discordID = raw.message.author.id
@@ -571,11 +578,11 @@ class Vg():
         # VALIDATES INPUT
         server = giveServer(server)
         game_mode = giveGameMode(game_mode)
-        days = giveDays(days)
+        page = givePages(page, 1)
         pages = givePages(pages)
 
         # NOTICE to be SENT
-        notice = "Looking for **" + str(game_mode) + "** matches of **" + str(player_name) + "** from the past **" + str(days) + "** days in the **" + str(server) + "** region... :eyes:"
+        notice = "Looking for **" + str(game_mode) + "** matches of **" + str(player_name) + "** from the past **31** days in the **" + str(server) + "** region... :eyes:"
 
         # Sends NOTICE to CLIENT
         msg = await self.bot.say(notice)
@@ -583,7 +590,23 @@ class Vg():
         try:
             # Await self.bot.edit_message(msg, embed=VG_module.getEmbedMatchesVG(player_name, server, game_mode, days, pages))
             # Get MATCHES GIVEN INPUT
-            matches = VG_module.getMatchesVG(pages, player_name, server, game_mode, days)
+            matches = VG_module.getMatchesVG(pages, player_name, server, game_mode, 31)
+
+            if matches == False:
+                await self.bot.edit_message(msg, "Couldn't get **" + str(game_mode) + "** matches for **" + str(player_name) + "** in the **" + str(server) + "** region from the past **31**... :sweat_smile:")
+                return
+
+        except:
+            await self.bot.edit_message(msg, "Couldn't get **" + str(game_mode) + "** matches for **" + str(player_name) + "** in the **" + str(server) +"** region from the past **31**... :sweat_smile:")
+            return
+
+        print("Player:   " + str(player_name) + "   |Match: " + str(matches[page]) + "   |GameMode: " + str(game_mode) + "   |Page: " + str(page) + "   |Pages: " + str(pages))
+
+        # FETCH the EMBED
+        embed = VG_module.getEmbedMatchesVG(player_name, matches[page], game_mode, page, pages)
+
+        try:
+            await self.bot.edit_message(msg, embed=embed)
 
             # SETUP REACTIONS
             # Get emojis from http://www.fileformat.info/info/unicode/char/27a1/browsertest.html or by messaging R. Danny in discordpy server
@@ -591,20 +614,10 @@ class Vg():
             await self.bot.add_reaction(msg, '\U000027a1')
 
         except:
-            await self.bot.edit_message(msg, "Couldn't get **" + str(game_mode) + "** matches for **" + str(player_name) + "** in the **" + str(server) +"** region from the past **" + str(days) + "**... :sweat_smile:")
-            return
-
-        # FETCH the EMBED
-        embed = VG_module.getEmbedMatchesVG(player_name, matches[0], game_mode, 1, pages)
-
-        try:
-            await self.bot.edit_message(msg, embed=embed)
-
-        except:
             await self.bot.edit_message(msg, "Couldn't set up your matches... :pensive:")
 
         # STORE MESSAGE DATA
-        msgs[msg.id] = {"IGN": player_name, 'Matches': matches, "Game_Mode": game_mode, 'PageNum': 0, 'Pages': pages}
+        msgs[msg.id] = {"IGN": player_name, 'Matches': matches, "Game_Mode": game_mode, 'Page': page, 'Pages': pages}
 
         # WAIT TEN MINUTES then TRY to DELETING the MSG
         await asyncio.sleep(600)
@@ -619,41 +632,41 @@ class Vg():
     async def on_reaction_add(self, reaction, user):
         msg = reaction.message
 
-        if msg.id in msgs.keys() and reaction.emoji == '➡' and msgs[msg.id]["PageNum"] <= msgs[msg.id]["Pages"]:
+        if msg.id in msgs.keys() and reaction.emoji == '➡' and msgs[msg.id]["Page"] <= msgs[msg.id]["Pages"]:
             # SET PAGE to CORRECT VALUE
-            msgs[msg.id]["PageNum"] += 1
-            # print(str(msgs[msg.id]["PageNum"]) + "   |   POSITION")
+            msgs[msg.id]["Page"] += 1
+            # print(str(msgs[msg.id]["Page"]) + "   |   POSITION")
 
             # EDIT the MSG CORRESPONDING to the REACTION
-            await self.bot.edit_message(reaction.message, embed=VG_module.getEmbedMatchesVG(str(msgs[msg.id]['IGN']), msgs[msg.id]["Matches"][msgs[msg.id]["PageNum"]], str(msgs[msg.id]["Game_Mode"]), int(msgs[msg.id]['PageNum'] + 1), int(msgs[msg.id]['Pages'])))
+            await self.bot.edit_message(reaction.message, embed=VG_module.getEmbedMatchesVG(str(msgs[msg.id]["IGN"]), msgs[msg.id]["Matches"][msgs[msg.id]["Page"]], str(msgs[msg.id]["Game_Mode"]), int(msgs[msg.id]["Page"] + 1), int(msgs[msg.id]["Pages"])))
 
-        elif msg.id in msgs.keys() and reaction.emoji == '⬅' and msgs[msg.id]["PageNum"] > 0:
+        elif msg.id in msgs.keys() and reaction.emoji == '⬅' and msgs[msg.id]["Page"] > 0:
             # SET PAGE to CORRECT VALUE
-            msgs[msg.id]["PageNum"] -= 1
-            # print(str(msgs[msg.id]["PageNum"]) + "   |   POSITION")
+            msgs[msg.id]["Page"] -= 1
+            # print(str(msgs[msg.id]["Page"]) + "   |   POSITION")
 
             # EDIT the MSG CORRESPONDING to the REACTION
-            await self.bot.edit_message(reaction.message, embed=VG_module.getEmbedMatchesVG(str(msgs[msg.id]['IGN']), msgs[msg.id]["Matches"][msgs[msg.id]["PageNum"]], str(msgs[msg.id]["Game_Mode"]), int(msgs[msg.id]['PageNum'] + 1), int(msgs[msg.id]['Pages'])))
+            await self.bot.edit_message(reaction.message, embed=VG_module.getEmbedMatchesVG(str(msgs[msg.id]["IGN"]), msgs[msg.id]["Matches"][msgs[msg.id]["Page"]], str(msgs[msg.id]["Game_Mode"]), int(msgs[msg.id]["Page"] + 1), int(msgs[msg.id]["Pages"])))
 
     # RUNS whenever a REACTION is REMOVED
     async def on_reaction_remove(self, reaction, user):
         msg = reaction.message
 
-        if msg.id in msgs.keys() and reaction.emoji == '➡' and msgs[msg.id]["PageNum"] <= msgs[msg.id]["Pages"]:
+        if msg.id in msgs.keys() and reaction.emoji == '➡' and msgs[msg.id]["Page"] <= msgs[msg.id]["Pages"]:
             # SET PAGE to CORRECT VALUE
-            msgs[msg.id]["PageNum"] += 1
-            # print(str(msgs[msg.id]["PageNum"]) + "   |   POSITION")
+            msgs[msg.id]["Page"] += 1
+            # print(str(msgs[msg.id]["Page"]) + "   |   POSITION")
 
             # EDIT the MSG CORRESPONDING to the REACTION
-            await self.bot.edit_message(reaction.message, embed=VG_module.getEmbedMatchesVG(str(msgs[msg.id]['IGN']), msgs[msg.id]["Matches"][msgs[msg.id]["PageNum"]], str(msgs[msg.id]["Game_Mode"]), int(msgs[msg.id]['PageNum'] + 1), int(msgs[msg.id]['Pages'])))
+            await self.bot.edit_message(reaction.message, embed=VG_module.getEmbedMatchesVG(str(msgs[msg.id]["IGN"]), msgs[msg.id]["Matches"][msgs[msg.id]["Page"]], str(msgs[msg.id]["Game_Mode"]), int(msgs[msg.id]["Page"] + 1), int(msgs[msg.id]["Pages"])))
 
-        elif msg.id in msgs.keys() and reaction.emoji == '⬅' and msgs[msg.id]["PageNum"] > 0:
+        elif msg.id in msgs.keys() and reaction.emoji == '⬅' and msgs[msg.id]["Page"] > 0:
             # SET PAGE to CORRECT VALUE
-            msgs[msg.id]["PageNum"] -= 1
-            # print(str(msgs[msg.id]["PageNum"]) + "   |   POSITION")
+            msgs[msg.id]["Page"] -= 1
+            # print(str(msgs[msg.id]["Page"]) + "   |   POSITION")
 
             # EDIT the MSG CORRESPONDING to the REACTION
-            await self.bot.edit_message(reaction.message, embed=VG_module.getEmbedMatchesVG(str(msgs[msg.id]['IGN']), msgs[msg.id]["Matches"][msgs[msg.id]["PageNum"]], str(msgs[msg.id]["Game_Mode"]), int(msgs[msg.id]['PageNum'] + 1), int(msgs[msg.id]['Pages'])))
+            await self.bot.edit_message(reaction.message, embed=VG_module.getEmbedMatchesVG(str(msgs[msg.id]["IGN"]), msgs[msg.id]["Matches"][msgs[msg.id]["Page"]], str(msgs[msg.id]["Game_Mode"]), int(msgs[msg.id]["Page"] + 1), int(msgs[msg.id]["Pages"])))
 
 def setup(bot):
     bot.add_cog(Vg(bot))
