@@ -37,7 +37,7 @@ def giveKarmaVG(karma, mode=0):
 def giveMatchVG(match, mode=0):
     match = str(match)  # Convert MATCH to STRING to prevent ERRORS
     
-    match_dict = {
+    api_to_match = {
                  "blitz_pvp_ranked": "Blitz",
                  "casual_aral": "Battle Royal",
                  "private": "Private Casual",
@@ -48,21 +48,25 @@ def giveMatchVG(match, mode=0):
                  "ranked": "Rank Match"
                  }
      
-    reverse_match = {
+    match_to_api = {
                     "casual": "casual",
                     "blitz": "blitz_pvp_ranked",
                     "royale": "casual_aral",
                     "rank": "ranked"
                     }
+
+    # Return API NAME
     if mode == 0:
         try:
-            return match_dict[match]
+            return api_to_match[match]
     
         except:
             return match
+
+    # Return IGN
     elif mode == 1:
         try:
-            return reverse_match[match]
+            return match_to_api[match]
     
         except:
             return match
