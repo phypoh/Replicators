@@ -4,7 +4,7 @@ import config
 import pickle
 
 keyBot = ""
-startup_extensions = ["BOT_commands", 'VG_commands']
+startup_extensions = ["BOT_commands", 'VG_commands', 'matchmaker']
 descriptionBOT = "EZLBot is a bot created for Discord to utilize the VG api!"
 
 bot = commands.Bot(command_prefix='$', description=descriptionBOT)
@@ -111,5 +111,5 @@ if __name__ == "__main__":
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)
             print('Failed to load extension {}\n{}'.format(extension, exc))
-    
+
     bot.run(keyBot)
