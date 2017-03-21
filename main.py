@@ -44,9 +44,11 @@ async def on_ready():
 async def on_message(message):
     # FOR DEBUGGING
     # print(str(config.serverprefixes) + "   |   REAL TIME PREFIXES")
-
-    prefix = config.serverprefixes.get(message.server.id, '$')  # Get the PREFIX for SERVER
-    bot.command_prefix = [prefix]
+    try:
+        prefix = config.serverprefixes.get(message.server.id, '$')  # Get the PREFIX for SERVER
+        bot.command_prefix = [prefix]
+    except:
+        bot.command_prefix = ['$']
     await bot.process_commands(message)
 
 
