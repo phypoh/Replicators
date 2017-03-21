@@ -789,11 +789,13 @@ def getMatches(ign, m, region='na',page =1, num =1):
     for i in m.rosters[1].participants:
         i.actor = heroes.get(i.actor, i.actor)
         i.actor = (i.actor).replace('*','')
+        t2_tier += i.stats['skillTier']
+        
+    for i in m.rosters[1].participants:
         if i.player.name == ign:
             t1_tier,t2_tier = t2_tier,t1_tier
             t1,t2 = t2,t1
             player = i
-        t2_tier += i.stats['skillTier']
 
     gamemode = match_dict.get(m.gameMode, m.gameMode)
     if t1.participants[0].stats['winner']:
