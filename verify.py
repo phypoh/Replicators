@@ -14,7 +14,6 @@ except:
     auth = dict() #Initializes auth
     auth['confirmed'] = list() #For 100% confirmed igns.
 
-auth['confirmed'].remove('SpiesWithin')
 def storeAuth():
     with open("auth.pickle", "wb") as handle:
         pickle.dump(auth, handle, protocol=pickle.HIGHEST_PROTOCOL)
