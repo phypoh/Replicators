@@ -101,7 +101,16 @@ class Bot():
     async def about(self):
         """Gives you some info on this bot."""
 
-        await self.bot.say("Hi, I'm *" + str(nameBOT) + "*, and I've been developed in Python and have grown with lots of love. You can see a list of our commands with the **help** command!")
+        embed = discord.Embed(title="About", url="https://discordapp.com", description="Hi, I'm **" + str(NAME) + "**, developed by Halcyon Hackers with love, python, and VG API. I'm a growing community bot that has new features added regularly. For now I control VG soon I will control the world. :smiley:")
+
+        embed.set_author(name="EZLBot", url="http://ezlgg.com/bot", icon_url=PROFILEIMG)
+        embed.set_footer(text=FOOTER, icon_url=PROFILEIMG)
+
+        embed.add_field(name="What Can I Do?", value="For a quick look at what I can do type $help, but for a detailed list, please check http://ezlgg.com/ezlbot-documentation/")
+        embed.add_field(name="Talk To My Developers!", value="Come join us at http://discord.me/EZLBot. If you believe you found a bug, error, need to report something contact us by sending a message. $report message Fair warning, use this too much and you will lose it. With great power comes great responsibility.")
+        embed.add_field(name="Bot Status:", value="Servers I'm In: " + str(len(self.bot.servers)))
+
+        await self.bot.say(embed=embed)
 
     # Used to CHANGE the PREFIX
     @commands.command(pass_context=True)
@@ -130,6 +139,37 @@ class Bot():
         await self.bot.say("**prefixed changed to " + str(
             prefix) + "**\nPlease don't forget your new prefix.\nWant me good as new? Just kick me out of the server and reinvite me.")
         main.storePrefix()
+
+    # Used to SEND a COMPLAINT
+    @commands.command(pass_context=True)
+    @commands.cooldown(1, 3600, BucketType.user)
+    async def report(self, raw, prefix=""):
+        """Report an instance involving the bot.
+
+                >complaint (message)
+            message   ~   Report message
+
+            Example:
+                >report My guild was taken by someone else contact me at player1#7777
+
+        """
+
+        msg = raw.message.content
+        author = raw.message.author
+        server = raw.message.server
+        msg = msg.split("report ", 1)
+
+        # FOR DEBUGGING
+        # print(msg)
+
+        report = "FROM: " + str(author) + " | SERVER: " + str(server) + "\nMSG:   " + str(msg[1])
+
+        try:
+            await self.bot.send_message(self.bot.get_channel("292168218385055744"), report)
+            await self.bot.say("Report Sent :ok_hand:")
+
+        except:
+            print("Couldn't send report:   " + str(msg[1]))
 
 def setup(bot):
     bot.add_cog(Bot(bot))
