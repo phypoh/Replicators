@@ -6,14 +6,13 @@ Verify users through unique item patterns.
 """
 
 api = gamelocker.Gamelocker(keyVG).Vainglory()
-
 try:
     with open('auth.pickle', 'rb') as handle:
         auth = pickle.load(handle)
+
 except:
     auth = dict() #Initializes auth
     auth['confirmed'] = list() #For 100% confirmed igns.
-
 
 def storeAuth():
     with open("auth.pickle", "wb") as handle:
@@ -45,7 +44,7 @@ def start(discordid,ign, region):
     auth[discordid]['region'] = region
     auth[discordid]['ign'] = ign
     auth[discordid]['confirmed'] = False
-    auth[discordid]['startdate'] = (datetime.datetime.utcnow() - timedelta(minutes=5)).isoformat().split('.')[0] + 'Z' #date in iso 8601  so we can check for new matches.
+    auth[discordid]['startdate'] = (datetime.datetime.utcnow() - timedelta(minutes=10)).isoformat().split('.')[0] + 'Z' #date in iso 8601  so we can check for new matches.
     pattern = []
     for i in range(0,5):
         pattern.append(random.choice(range(0,3))) #random from 0,1,2
@@ -59,7 +58,7 @@ def check(discordid):
     ign  = auth[discordid]['ign']
     region  = auth[discordid]['region']
     try:
-        m = api.matches({"page[limit]": 1, "filter[playerNames]": ign, "filter[createdAt-start]": auth[discordid]['startdate'], "sort": "-createdAt", 'filter[gameMode]': 'blitz_pvp_ranked'}, region = region)
+        m = api.matches({"page[limit]": 1, "filter[playerNames]": ign, "filter[createdAt-start]": '2017-01-01T08:25:30Z', "sort": "-createdAt", 'filter[gameMode]': 'blitz_pvp_ranked'}, region = region)
         m = m[0]
     except:
         raise ValueError("No new matches.")
@@ -88,7 +87,7 @@ def check(discordid):
         elif i == 'Crystal Infusion':
             items[items.index(i)] = 2
         else:
-            items[items.index(i)] = "Other"
+            items[items.index(i)] = 10
     if sorted(items, key=int) == sorted(auth[discordid]['pattern'], key=int): #So order doesn't matter
         auth[discordid]['confirmed']=True
         auth['confirmed'].append(ign) #adds to list of confirmed igns
@@ -98,7 +97,10 @@ def check(discordid):
         items = [x if x != 0 else 'Halcyon Potion' for x in items]
         items = [x if x != 1 else 'Weapon Infusion' for x in items] #Checks for all 1's and replaces it with Weapon Infusion
         items  = [x if x != 2 else 'Crystal Infusion' for x in items] #Checks for all 2's and replaces it with Crystal Infusion
-        raise ValueError('Invalid Pattern:\nYours: '+ str(sorted(items, key=int)) + "\nPattern: "+ str(sorted(auth[discordid]['pattern'], key=int)) + '\nRemember patterns are meant to be bought in order.')
+        pattern_ = [x if x != 0 else 'Halcyon Potion' for x in auth[discordid]['pattern']]
+        pattern_ = [x if x != 1 else 'Weapon Infusion' for x in pattern_] #Checks for all 1's and replaces it with Weapon Infusion
+        pattern_  = [x if x != 2 else 'Crystal Infusion' for x in pattern_] #Checks for all 2's and replaces it with Crystal Infusion
+        raise ValueError('Invalid Pattern:\nYours: '+ str(items) + "\nPattern: "+ str(pattern_) + '\nRemember patterns are meant to be bought in order.')
 
 
 def isauth(discordid, ign): #checks if discordid is confirmed on the ign given
@@ -123,3 +125,13 @@ def id_to_ign(discordid):
 
 def to_dict(discordid):
     return auth[discordid]
+
+def delete(discordid):
+    del auth[discordid]
+def confirm(discordid):
+    ign  = auth[discordid]['ign']
+    auth[discordid]['confirmed'] = True
+    auth['confirmed'].append(ign)
+    storeAuth()
+
+
