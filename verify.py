@@ -1,12 +1,11 @@
 import gamelocker, pickle, datetime, random, requests
 from datetime import timedelta
-
+from VG_module import keyVG
 """
 Verify users through unique item patterns.
 """
 
-APIKEY = ""
-api = gamelocker.Gamelocker(APIKEY).Vainglory()
+api = gamelocker.Gamelocker(keyVG).Vainglory()
 
 try:
     with open('auth.pickle', 'rb') as handle:
@@ -103,9 +102,13 @@ def check(discordid):
 
 
 def isauth(discordid, ign): #checks if discordid is confirmed on the ign given
-    if auth[discordid]['ign']== ign and auth[discordid]['confirmed']:
-        return True
-    return False
+    try:
+        if auth[discordid]['ign']== ign and auth[discordid]['confirmed']:
+            return True
+        else:
+            return False
+    except:
+        return False
 
 def ign(ign): #Checks if ign is confirmed
     if ign in auth['confirmed']:
@@ -117,3 +120,6 @@ def id(discordid): #checks if discordid is confirmed
 
 def id_to_ign(discordid):
     return auth[discordid]['ign']
+
+def to_dict(discordid):
+    return auth[discordid]

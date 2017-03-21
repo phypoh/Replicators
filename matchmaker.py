@@ -5,7 +5,7 @@ import gamelocker, datetime, dateutil.parser
 from VG_module import keyVG
 api = gamelocker.Gamelocker(keyVG).Vainglory()
 msgs = dict()
-import random
+import random, verify
 from discord.ext.commands.cooldowns import BucketType
 """
 Author: @SpiesWithin
@@ -173,7 +173,7 @@ def playerListEmbed(playerlist,page,num): #Generates an embed from the list of p
     em.add_field(name = 'Playing Time:', value = q['time'])
     em.add_field(name = 'Favorite Role:', value = q['role'])
     em.add_field(name = 'Voice:', value = q['voice'])
-    em.set_author(name=q['ign'][:3]+"----", icon_url= avatar)
+    em.set_author(name=q['ign'], icon_url= avatar)
     em.set_footer(text=random.choice(quotes), icon_url= 'http://www.vaingloryfire.com/images/wikibase/icon/items/oakheart.png')
     return em
 
@@ -224,7 +224,8 @@ class Matchmaker():
                     if i == str(user):
                         await self.bot.send_message(user,"Sorry, you were blocked from contacting {}.".format(q['ign']))
                         return
-            await self.bot.send_message(user, ":ok_hand:, I have notified {}. Please join https://discord.me/EZLBot to contact them. Or you can dm them at {}.".format(q['ign'], str(match)))
+            await self.bot.send_message(user, ":ok_hand:, I have notified {}. Please join https://discord.me/EZLBot to contact them. Or you can dm them at ".format(q['ign'] ) )
+            await self.bot.send_message(user, str(match))
             await self.bot.send_message(match,content="Hey, you've been matched by {}. Here are the details. You can contact them at http://discord.me/EZLBot or dm them at {}. To remove yourself from the queue, type $dequeue".format(_user['ign'], str(user)) )
             await self.bot.send_message(match, embed=getplayerEmbed(user.id))
             del msgs[msg.id] #deletes the msg from the dict so it can't be controlled by reactions anymore
@@ -241,21 +242,39 @@ class Matchmaker():
             page = msgs[msg.id]['page']
             await self.bot.edit_message(reaction.message, embed=playerListEmbed(msgs[msg.id]['list'],page,len(msgs[msg.id]['list'])))
 
+    @commands.cooldown(1, 5, BucketType.user)
     @commands.command(description='Signup for a matchmaker that puts Match.com to shame!', pass_context=True)
-    async def signup(self,ctx, ign='', region='na'):
+    async def vgtinder(self,ctx):
         """
         Used to signup for the queue:
-        $signup <ign> <region> ==> Reaction Menu
+        $vgtinder <ign> <region> ==> Reaction Menu
         Only in Private Messages
         """
+        try:
+            verifyd = verify.to_dict(ctx.message.author.id)
+            ign = verifyd['ign']
+            region = verifyd['region']
+        except:
+            await self.bot.say("Sorry, you must authorize your account with {}verify".format(self.bot.command_prefix[0]))
+            return
         if not ctx.message.channel.is_private: #Makes sure channel is private
             await self.bot.say('Sorry. But this process must be done in a private message.')
             return
+        if not verify.isauth(ctx.message.author.id, ign):
+            try:
+                check = verify.check(ctx.message.author.id)
+                await self.bot.say('I verified your account.')
+            except:
+                await self.bot.say("Sorry, you must authorize your account with {}verify {} {}".format(self.bot.command_prefix[0], ign,region))
+                return
+        print(1)
         region = region.lower()
+        print(2)
         if region == 'sea':
             region = 'sg'
         if region not in ['sg', 'na', 'eu', 'sa', 'ea'] or ign == '':
             return
+        print(3)
         try:
             m = api.matches({"page[limit]": 50, "filter[playerNames]": ign, "filter[createdAt-start]": "2017-01-01T08:25:30Z", "sort": "-createdAt"}, region = region)
             m = sorted(m, key=lambda d: d.createdAt, reverse=True)#sorts  match
@@ -272,7 +291,6 @@ class Matchmaker():
         await self.bot.add_reaction(msg, '\U00000031\U000020e3')
         await self.bot.add_reaction(msg, '\U00000032\U000020e3')
         await self.bot.add_reaction(msg, '\U00000033\U000020e3')
-        asyncio.sleep(1)
         res = await self.bot.wait_for_reaction(['1⃣', '2⃣', '3⃣'], message = msg, user = ctx.message.author, timeout=  600)
         if res.reaction.emoji == '1⃣':
             q['voice'] = 'Yes'
@@ -287,7 +305,6 @@ class Matchmaker():
         await self.bot.add_reaction(msg, '\U00000033\U000020e3')
         await self.bot.add_reaction(msg, '\U00000034\U000020e3')
         await self.bot.add_reaction(msg, '\U00000035\U000020e3')
-        asyncio.sleep(2) #so it doesn't see these reactions in res
         res = await self.bot.wait_for_reaction(['1⃣', '2⃣', '3⃣', '4⃣', '5⃣'], message = msg, user = ctx.message.author, timeout=  600)
         if res.reaction.emoji == '1⃣':
             q['gamemode'] = 'ranked'
@@ -305,7 +322,6 @@ class Matchmaker():
         await self.bot.add_reaction(msg, '\U00000032\U000020e3')
         await self.bot.add_reaction(msg, '\U00000033\U000020e3')
         await self.bot.add_reaction(msg, '\U00000034\U000020e3')
-        asyncio.sleep(1.5)
         res = await self.bot.wait_for_reaction(['1⃣', '2⃣', '3⃣', '4⃣'], message = msg, user = ctx.message.author, timeout=  600)
         if res.reaction.emoji == '1⃣':
             q['diff'] = 1
@@ -322,7 +338,6 @@ class Matchmaker():
         await self.bot.add_reaction(msg, '\U00000033\U000020e3')
         await self.bot.add_reaction(msg, '\U00000034\U000020e3')
         await self.bot.add_reaction(msg, '\U00000035\U000020e3')
-        asyncio.sleep(2)
         res = await self.bot.wait_for_reaction(['1⃣', '2⃣', '3⃣', '4⃣', '5⃣'], message = msg, user = ctx.message.author, timeout=  600)
         if res.reaction.emoji == '1⃣':
             q['time'] = 'Morning'
@@ -345,7 +360,6 @@ class Matchmaker():
         await self.bot.add_reaction(msg, '\U00000032\U000020e3')
         await self.bot.add_reaction(msg, '\U00000033\U000020e3')
         await self.bot.add_reaction(msg, '\U00000034\U000020e3')
-        asyncio.sleep(2)
         res = await self.bot.wait_for_reaction(['1⃣', '2⃣', '3⃣', '4⃣'], message = msg, user = ctx.message.author, timeout=  600)
         if res.reaction.emoji == '1⃣':
             q['role'] = 'Captain'
@@ -355,7 +369,7 @@ class Matchmaker():
             q['role'] = 'Carry'
         else:
             q['role'] = 'any'
-        await self.bot.say('Awesome, you\'re ready now to start finding players, do {0}queue. To update your stats when your tier changes, or you change your mind. Just do {}signup {} {} again!'.format(self.bot.command_prefix[0], ign,region))
+        await self.bot.say('Awesome, you\'re ready now to start finding players, do {0}queue. To update your stats when your tier changes, or you change your mind. Just do {}vgtinder again.'.format(self.bot.command_prefix[0]))
         p = getPlayer(m[0], ign)
         q['tier'] = p.stats['skillTier']
         q['karma'] = p.stats['karmaLevel']
@@ -397,6 +411,7 @@ class Matchmaker():
             q = queue[ctx.message.author.id]
         except:
             await self.bot.say("Umm, this is awkward, but you're not in the queue.")
+            return
         for i in queue.keys():
             if queue[i].get('dead', False): #Checks if user is in queue and has not used $dequeue
                 continue
@@ -497,7 +512,7 @@ class Matchmaker():
         try:
             queue[ctx.message.author.id]['dead'] = True #Instead of deleting, which resets popularity.
         except:
-            await self.bot.say("You aren't in the queue :face_palm: Join it with {}signup".format(self.bot.command_prefix[0]))
+            await self.bot.say("You aren't in the queue :face_palm: Join it with {}vgtinder".format(self.bot.command_prefix[0]))
             return
         await self.bot.say("Ok, you've been removed from the queue.")
 

@@ -1,12 +1,11 @@
+
 # VG Commands:
 # File containing all of VG commands for Discord
 """
-
 List of Commands:
 player
 stats
 match
-
 """
 
 # IMPORTS
@@ -17,12 +16,13 @@ import VG_module
 import VG_toolbox
 import config
 import pickle
-import asyncio
+from VG_module import getMatches, apiVG
+import dateutil.parser,asyncio
 
 # DISCORD EMBED VARIABLES--
 botImageDISCORD = "http://i63.tinypic.com/9k6xcj.jpg"  # URL of BOTS IMAGE
 signatureDISCORD = "Big Thanks to SEMC and MadGlory! Made with love."  # String used in FOOTER as MESSAGE
-msgs = {}  # DICTIONARY OF ALL MATCHES MESSAGES
+msgs = dict()
 
 # Stores PLAYERVGQ DICT
 def storePlayersVGQ():
@@ -136,7 +136,7 @@ def giveGameMode(game_mode):
     game_mode = str(game_mode.lower())
 
     if game_mode == "":
-        return "any"
+        game_mode = "any"
 
     return game_mode
 
@@ -172,68 +172,49 @@ def giveAuto(auto):
         return False
 
 
-# Checks if PAGES is VALID
-def checkPages(pages):
-    if pages == "":
-        return False
-
-    elif tools.isIntTOOL(pages) == False:
-        return False
-
-    elif pages == False or pages == True:
-        return False
-
-    else:
-        return True
-
-
-# GIVES VALID PAGES
-def givePages(pages, mode=0):
-    if checkPages(pages) == False:
-        if mode == 0:
-            return 25
-
-        elif mode == 1:
-            return 1
-
-        else:
-            return 1
-
-    pages = int(pages)
-
-    if pages <= 0:
-        return 1
-
-    elif pages > 50:
-        return 50
-
-    else:
-        return pages
-
 # CLASS containing ALL COMMANDS for THIS MODULE
 class Vg():
     """All the commands in relation to Vainglory.
-
             Made with love and some Vainglory api, python - gamelocker.
-
     """
 
     def __init__(self, bot):
         self.bot = bot
 
+    async def on_reaction_add(self, reaction,user):
+        if reaction.message.id in msgs.keys() and reaction.emoji == '➡':
+            msg = reaction.message
+            msgs[msg.id]['page'] += 1
+            page = msgs[msg.id]['page']
+            await self.bot.edit_message(reaction.message,new_content='Embed: ', embed=getMatches(msgs[msg.id]['ign'], msgs[msg.id]['m'][page-1], msgs[msg.id]['region'],page,msgs[msg.id]['num']))
+        elif reaction.message.id in msgs.keys() and reaction.emoji == '⬅':
+            msg = reaction.message
+            msgs[msg.id]['page'] -= 1
+            page = msgs[msg.id]['page']
+            await self.bot.edit_message(reaction.message,new_content='Embed: ', embed=getMatches(msgs[msg.id]['ign'], msgs[msg.id]['m'][page-1], msgs[msg.id]['region'],page,msgs[msg.id]['num']))
+
+    async def on_reaction_remove(self, reaction,user):
+        if reaction.message.id in msgs.keys() and reaction.emoji == '➡':
+            msg = reaction.message
+            msgs[msg.id]['page'] += 1
+            page = msgs[msg.id]['page']
+            await self.bot.edit_message(reaction.message,new_content='Embed: ', embed=getMatches(msgs[msg.id]['ign'], msgs[msg.id]['m'][page-1], msgs[msg.id]['region'],page,msgs[msg.id]['num']))
+        elif reaction.message.id in msgs.keys() and reaction.emoji == '⬅':
+            msg = reaction.message
+            msgs[msg.id]['page'] -= 1
+            page = msgs[msg.id]['page']
+            await self.bot.edit_message(reaction.message,new_content='Embed: ', embed=getMatches(msgs[msg.id]['ign'], msgs[msg.id]['m'][page-1], msgs[msg.id]['region'],page,msgs[msg.id]['num']))
+
     @commands.command(pass_context=True)
     async def stats(self, raw, player_name="", server="na", game_mode="any", days="31", auto="False"):
-        """Gets a players performance in the past days. Works with VGQ.
-
+        """Gets a players performance in the past days.
                 >stats (player_name) (server) (game_mode) (days)
             player_name   ~   name of player to search for
             server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sea or sg, ea, sa
             game_mode     ~   game mode you would like performance check   ~   default: any, options: any, casual, ranked, royale, blitz
-            days          ~   day range to search from                     ~   default: 31, options: maximum: 93, minimum: 1
-
+            days          ~   day range to search from                     ~   default: 31, requirements: maximum: 93, minimum: 1
             example:
                 >stats player1 na casual 7
-
         """
 
         # AUTO IS A SECRET VARIABLE THAT MAKES COMPUTER CHECK EVERY SERVER FOR PLAYER !!!WASTE OF API KEY!!!
@@ -242,14 +223,13 @@ class Vg():
         # Checks if NOTHING was GIVEN
         if player_name == "" and server == "na" and game_mode == "any" and days == "31" and auto == "False":
 
-            # Get the AUTHORS ID
             discordID = raw.message.author.id
 
             # If author in VGQ then GET DATA
-            data = config.playersVGQ.get(discordID, False)  # Get the AUTHORS VGQ INFO
+            data = config.playersVGQ.get(discordID, False)  # Get the PREFIX for SERVER
 
             if data == False:
-                await self.bot.say("You'll need to add yourself to the **VGQ** before using commands without arguments. :stuck_out_tounge:\nEnter the **help** command followed by **saveVG** to see more... :hugging:")
+                await self.bot.say("You need to add yourself to the **VGQ** first! :face_palm:\nEnter the help command followed by saveVG to see more... :stuck_out_tongue:")
                 return
 
             else:
@@ -267,7 +247,7 @@ class Vg():
                     return
 
         # FOR DEBUGGING
-        # print("INPUT - PLAYER_NAME: " + str(player_name) + "   | GAME_MODE: " + str(game_mode) + "   | SERVER: " + str(server) + "   | DAYS: " + str(days) + "   | AUTO: " + str(auto))
+        print("INPUT - PLAYER_NAME: " + str(player_name) + "   | GAME_MODE: " + str(game_mode) + "   | SERVER: " + str(server) + "   | DAYS: " + str(days) + "   | AUTO: " + str(auto))
 
         if checkName(player_name) == False:
             await self.bot.say("No valid player name was given... :sweat_smile:")
@@ -282,7 +262,7 @@ class Vg():
         auto = giveAuto(auto)
 
         # FOR DEBUGGING
-        # print("NAME: " + player_name + "   | GAMEMODE: " + game_mode + "   | SERVER: " + server + "   | DAYS: " + str(days) + "   | AUTO: " + str(auto))
+        print("NAME: " + player_name + "   | GAMEMODE: " + game_mode + "   | SERVER: " + server + "   | DAYS: " + str(days) + "   | AUTO: " + str(auto))
 
         notice = "Looking at stats of **" + str(game_mode) + "** matches for **" + str(player_name) + "** from the past **" + str(days) + "** days in the **" + str(server) + "** region... :eyes:"
 
@@ -301,15 +281,12 @@ class Vg():
 
     @commands.command(pass_context=True)
     async def player(self, raw, player_name="", server="na", auto="False"):
-        """Checks if player exist in vainglory. Works with VGQ.
-
+        """Checks if player exist in vainglory.
                 >player (player_name) (server) (mode)
             player_name   ~   name of player to check for
             server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sea or sg, ea, sa
-
             Example:
                 >player player1 na
-
         """
 
         # AUTO IS A SECRET VARIABLE THAT MAKES COMPUTER CHECK EVERY SERVER FOR PLAYER !!!WAIST OF API KEY!!!
@@ -318,14 +295,15 @@ class Vg():
         # Checks if NOTHING was GIVEN
         if player_name == "" and server == "na" and auto == "False":
 
-            # Get the AUTHORS ID
             discordID = raw.message.author.id
 
             # If author in VGQ then GET DATA
-            data = config.playersVGQ.get(discordID, False)  # Get the AUTHORS VGQ INFO
+            discordID = raw.message.author.id
+
+            data = config.playersVGQ.get(discordID, False)  # Get the PREFIX for SERVER
 
             if data == False:
-                await self.bot.say("You'll need to add yourself to the **VGQ** before using commands without arguments. :stuck_out_tounge:\nEnter the **help** command followed by **saveVG** to see more... :hugging:")
+                await self.bot.say("You need to add yourself to the **VGQ** first! :face_palm:\nEnter the help command followed by saveVG to see more... :stuck_out_tongue:")
                 return
 
             else:
@@ -343,7 +321,7 @@ class Vg():
                     return
 
         # FOR DEBUGGING
-        # print("INPUT - PLAYER_NAME: " + str(player_name) + "   | SERVER: " + str(server) + "   | AUTO: " + str(auto))
+        print("INPUT - PLAYER_NAME: " + str(player_name) + "   | SERVER: " + str(server) + "   | AUTO: " + str(auto))
 
         if checkName(player_name) == False:
             await self.bot.say("No valid player name was given... :sweat_smile:")
@@ -372,16 +350,13 @@ class Vg():
 
     @commands.command(pass_context=True)
     async def latest(self, raw, player_name="", server="na", game_mode="any", auto="False"):
-        """Fetched the latest Vainglory match. Works with VGQ.
-
-                >latest (player_name) (server) (game_mode)
+        """Fetched the latest Vainglory match.
+                >player (player_name) (server) (game_mode)
             player_name   ~   name of player to check for
             server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sea or sg, ea, sa
             game_mode     ~   game mode you would like performance check   ~   default: any, options: any, casual, ranked, royale, blitz
-
             Example:
-                >latest player1 na casual
-
+                >match player1 na casual
         """
         game_mode = game_mode.lower()
 
@@ -391,14 +366,13 @@ class Vg():
         # Checks if NOTHING was GIVEN
         if player_name == "" and server == "na" and game_mode == "any" and auto == "False":
 
-            # Get the AUTHORS ID
             discordID = raw.message.author.id
 
             # If author in VGQ then GET DATA
-            data = config.playersVGQ.get(discordID, False)  # Get the AUTHORS VGQ INFO
+            data = config.playersVGQ.get(discordID, False)  # Get the PREFIX for SERVER
 
             if data == False:
-                await self.bot.say("You'll need to add yourself to the **VGQ** before using commands without arguments. :stuck_out_tounge:\nEnter the **help** command followed by **saveVG** to see more... :hugging:")
+                await self.bot.say("You need to add yourself to the **VGQ** first! :face_palm:\nEnter the help command followed by saveVG to see more... :stuck_out_tongue:")
                 return
 
             else:
@@ -416,7 +390,7 @@ class Vg():
                     return
 
         # FOR DEBUGGING
-        # print("INPUT - PLAYER_NAME: " + str(player_name) + "   | GAME_MODE: " + str(game_mode) + "   | SERVER: " + str(server) + "   | AUTO: " + str(auto))
+        print("INPUT - PLAYER_NAME: " + str(player_name) + "   | GAME_MODE: " + str(game_mode) + "   | SERVER: " + str(server) + "   | AUTO: " + str(auto))
 
         if checkName(player_name) == False:
             await self.bot.say("No valid player name was given... :sweat_smile:")
@@ -447,11 +421,9 @@ class Vg():
     @commands.command(pass_context=True)
     async def saveVG(self, raw, player_name="", server="na"):
         """Save your Vainglory in-game name and region for quick looks ups.
-
                 >saveVG (player_name) (server)
             player_name   ~   name of player to check for
             server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sea or sg, ea, sa
-
             Example:
                 >saveVG player1 na
         """
@@ -477,19 +449,15 @@ class Vg():
     @commands.command(pass_context=True, hidden=True)
     async def VG(self, raw, data_type="player"):
         """Pull Vainglory data about yourself quick.
-
                 >saveVG (quick_command)
             quick_command   ~   data type to pull   ~   default: player, options: player, stats, match
-
             Example:
                 >VG stats
         """
 
-        # Get the AUTHORS ID
         discordID = raw.message.author.id
 
-        # If author in VGQ then GET DATA
-        data = config.playersVGQ.get(discordID, False)  # Get the AUTHORS VGQ INFO
+        data = config.playersVGQ.get(discordID, False)  # Get the PREFIX for SERVER
 
         if data == False:
             await self.bot.say("You need to add yourself to the **VGQ** first! :face_palm:\nEnter the help command followed by saveVG to see more... :stuck_out_tongue:")
@@ -535,138 +503,49 @@ class Vg():
             await self.bot.say("That isn't a quick command... :sweat_smile:")
             return
 
-    # Make an EMBED of MATCHES to SORT THROUGH
     @commands.command(pass_context=True)
-    async def matches(self, raw, player_name="", server="na", game_mode="any", page=1, pages=25):
-        """Reaction menu for matches, for when you want review multiple matches at once. Works with VGQ.
-
-                >matches (player_name) (server) (game_mode) (page) (pages)
-            player_name   ~   name of player to check for
-            server        ~   the server to which the player belongs to    ~   default: na, options: na, eu, sea or sg, ea, sa
-            game_mode     ~   game mode you would like performance check   ~   default: any, options: any, casual, ranked, royale, blitz
-            page          ~   page to start at                             ~   default: 1, options: maximum: 50, minimum: 1
-            pages         ~   number of matches to load                    ~   default: 25, range: maximum: 50, minimum: 1
-
-            Example:
-                >matches player1 na casual 7 3
-
+    async def matches(self,ctx, ign="", region = 'na',page=1 ,gamemode=''):
         """
-
-        if player_name == "" and server == "na" and game_mode == "any" and page == 1 and pages == 25:
-
-            # Get the AUTHORS ID
-            discordID = raw.message.author.id
-
+        Reaction menu for all your matches! Works with VGQ.
+        $matches <ign> <region> <page> <gamemode>
+        E.X: $matches SpiesWithin na
+        """
+        if ign == "" and region == "na" and page == 1 and gamemode == "":
+            discordID = ctx.message.author.id
             # If author in VGQ then GET DATA
-            data = config.playersVGQ.get(discordID, False)  # Get the AUTHORS VGQ INFO
-
+            data = config.playersVGQ.get(discordID, False)  # Get the PREFIX for SERVER
             if data == False:
-                await self.bot.say("You'll need to add yourself to the **VGQ** before using commands without arguments. :stuck_out_tounge:\nEnter the **help** command followed by **saveVG** to see more... :hugging:")
+                await self.bot.say("You need to add yourself to the **VGQ** first! :face_palm:\nEnter the help command followed by saveVG to see more... :stuck_out_tongue:")
                 return
-
             else:
-
-                # FETCH PLAYER VGQ INFO
-                player_name = data["IGN"]
-                server = data["Region"]
-
-        # Checks that NAME given is VALID
-        if checkName(player_name) == False:
-            await self.bot.say("No valid player name was given... :sweat_smile:")
-            return
-
-        # VALIDATES INPUT
-        server = giveServer(server)
-        game_mode = giveGameMode(game_mode)
-        page = givePages(page, 1)
-        pages = givePages(pages)
-
-        # NOTICE to be SENT
-        notice = "Looking for **" + str(game_mode) + "** matches of **" + str(player_name) + "** from the past **31** days in the **" + str(server) + "** region... :eyes:"
-
-        # Sends NOTICE to CLIENT
-        msg = await self.bot.say(notice)
-
+                ign = data["IGN"]
+                region = data['Region']
+        gamemode = gamemode.lower()
+        gamemode = VG_module.reverse_match.get(gamemode, '')
+        region = region.lower()
+        msg = await self.bot.say("Fetching data for {}.".format(ign))
         try:
-            # Await self.bot.edit_message(msg, embed=VG_module.getEmbedMatchesVG(player_name, server, game_mode, days, pages))
-            # Get MATCHES GIVEN INPUT
-            matches = VG_module.getMatchesVG(pages, player_name, server, game_mode, 31)
-
-            if matches == False:
-                await self.bot.edit_message(msg, "Couldn't get **" + str(game_mode) + "** matches for **" + str(player_name) + "** in the **" + str(server) + "** region from the past **31**... :sweat_smile:")
-                return
-
+            m = apiVG.matches({"page[limit]": 50, "filter[playerNames]": ign, "filter[createdAt-start]": "2017-01-01T08:25:30Z", "sort": "-createdAt", "filter[gameMode]": gamemode}, region = region)
         except:
-            await self.bot.edit_message(msg, "Couldn't get **" + str(game_mode) + "** matches for **" + str(player_name) + "** in the **" + str(server) +"** region from the past **31**... :sweat_smile:")
+            await self.bot.say("Error! Please check everything and use $help matches for more info. Remember it **is** caps sensitive.")
             return
-
-        print("Player:   " + str(player_name) + "   |Match: " + str(matches[page]) + "   |GameMode: " + str(game_mode) + "   |Page: " + str(page) + "   |Pages: " + str(pages))
-
-        # FETCH the EMBED
-        embed = VG_module.getEmbedMatchesVG(player_name, matches[page], game_mode, page, pages)
-
+        m = sorted(m, key=lambda d: d.createdAt, reverse=True)
+        num = len(m)
         try:
-            await self.bot.edit_message(msg, embed=embed)
-
-            # SETUP REACTIONS
-            # Get emojis from http://www.fileformat.info/info/unicode/char/27a1/browsertest.html or by messaging R. Danny in discordpy server
-            await self.bot.add_reaction(msg, '\U00002b05')
-            await self.bot.add_reaction(msg, '\U000027a1')
-
+            msg = await self.bot.edit_message(msg, new_content= 'Embed:', embed = getMatches(ign, m[page-1], region,page,num))
         except:
-            await self.bot.edit_message(msg, "Couldn't set up your matches... :pensive:")
-
-        # STORE MESSAGE DATA
-        msgs[msg.id] = {"IGN": player_name, 'Matches': matches, "Game_Mode": game_mode, 'Page': page, 'Pages': pages}
-
-        # WAIT TEN MINUTES then TRY to DELETING the MSG
-        await asyncio.sleep(600)
+            await self.bot.edit_message(msg, new_content="Sorry, couldn't find data for {} in {}. Check your region and or spelling. It **IS** caps sensitive.".format(ign, region))
+        await self.bot.add_reaction(msg, '\U00002b05')
+        await self.bot.add_reaction(msg, '\U000027a1')
+        #Get emojis from http://www.fileformat.info/info/unicode/char/27a1/browsertest.htm
+        #or by messaging R. Danny in discordpy server
+        msgs[msg.id] = {"ign": ign, 'm': m, 'page': page-1,'region':region,'num':num}
+        await asyncio.sleep(300)
         try:
             del msgs[msg.id]
             pass
-
         except:
             pass
-
-    # RUNS whenever a REACTION is ADDED
-    async def on_reaction_add(self, reaction, user):
-        msg = reaction.message
-
-        if msg.id in msgs.keys() and reaction.emoji == '➡' and msgs[msg.id]["Page"] <= msgs[msg.id]["Pages"]:
-            # SET PAGE to CORRECT VALUE
-            msgs[msg.id]["Page"] += 1
-            # print(str(msgs[msg.id]["Page"]) + "   |   POSITION")
-
-            # EDIT the MSG CORRESPONDING to the REACTION
-            await self.bot.edit_message(reaction.message, embed=VG_module.getEmbedMatchesVG(str(msgs[msg.id]["IGN"]), msgs[msg.id]["Matches"][msgs[msg.id]["Page"]], str(msgs[msg.id]["Game_Mode"]), int(msgs[msg.id]["Page"] + 1), int(msgs[msg.id]["Pages"])))
-
-        elif msg.id in msgs.keys() and reaction.emoji == '⬅' and msgs[msg.id]["Page"] > 0:
-            # SET PAGE to CORRECT VALUE
-            msgs[msg.id]["Page"] -= 1
-            # print(str(msgs[msg.id]["Page"]) + "   |   POSITION")
-
-            # EDIT the MSG CORRESPONDING to the REACTION
-            await self.bot.edit_message(reaction.message, embed=VG_module.getEmbedMatchesVG(str(msgs[msg.id]["IGN"]), msgs[msg.id]["Matches"][msgs[msg.id]["Page"]], str(msgs[msg.id]["Game_Mode"]), int(msgs[msg.id]["Page"] + 1), int(msgs[msg.id]["Pages"])))
-
-    # RUNS whenever a REACTION is REMOVED
-    async def on_reaction_remove(self, reaction, user):
-        msg = reaction.message
-
-        if msg.id in msgs.keys() and reaction.emoji == '➡' and msgs[msg.id]["Page"] <= msgs[msg.id]["Pages"]:
-            # SET PAGE to CORRECT VALUE
-            msgs[msg.id]["Page"] += 1
-            # print(str(msgs[msg.id]["Page"]) + "   |   POSITION")
-
-            # EDIT the MSG CORRESPONDING to the REACTION
-            await self.bot.edit_message(reaction.message, embed=VG_module.getEmbedMatchesVG(str(msgs[msg.id]["IGN"]), msgs[msg.id]["Matches"][msgs[msg.id]["Page"]], str(msgs[msg.id]["Game_Mode"]), int(msgs[msg.id]["Page"] + 1), int(msgs[msg.id]["Pages"])))
-
-        elif msg.id in msgs.keys() and reaction.emoji == '⬅' and msgs[msg.id]["Page"] > 0:
-            # SET PAGE to CORRECT VALUE
-            msgs[msg.id]["Page"] -= 1
-            # print(str(msgs[msg.id]["Page"]) + "   |   POSITION")
-
-            # EDIT the MSG CORRESPONDING to the REACTION
-            await self.bot.edit_message(reaction.message, embed=VG_module.getEmbedMatchesVG(str(msgs[msg.id]["IGN"]), msgs[msg.id]["Matches"][msgs[msg.id]["Page"]], str(msgs[msg.id]["Game_Mode"]), int(msgs[msg.id]["Page"] + 1), int(msgs[msg.id]["Pages"])))
 
 def setup(bot):
     bot.add_cog(Vg(bot))
