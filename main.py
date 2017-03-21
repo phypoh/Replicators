@@ -4,10 +4,10 @@ import config
 import pickle
 
 keyBot = ""
-startup_extensions = ["BOT_commands", 'VG_commands', 'matchmaker']
+startup_extensions = ["BOT_commands", 'VG_commands', 'matchmaker', 'auth-bot']
 descriptionBOT = "EZLBot is a bot created for Discord to utilize the VG api!"
 
-bot = commands.Bot(command_prefix='$', description=descriptionBOT)
+bot = commands.Bot(command_prefix='.', description=descriptionBOT)
 
 OWNERS = ['198255568882761728', '164026892796690433', '102704301956149248', '139537219793715200']  # When you want to AUTHENTICATE the AUTHOR
 
@@ -114,4 +114,4 @@ if __name__ == "__main__":
             exc = '{}: {}'.format(type(e).__name__, e)
             print('Failed to load extension {}\n{}'.format(extension, exc))
 
-    bot.run(keyBot)
+    bot.run('')
