@@ -3,7 +3,6 @@ import pickle, asyncio
 from discord import Embed
 import gamelocker, datetime, dateutil.parser
 from VG_module import keyVG
-keyVG = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJhMGYwYzZjMC1kZGRjLTAxMzQtOTQwMi0wMjQyYWMxMTAwMDUiLCJpc3MiOiJnYW1lbG9ja2VyIiwib3JnIjoiZHJ6aXNoYW4xMi1nbWFpbC1jb20iLCJhcHAiOiJhMGVmNDk0MC1kZGRjLTAxMzQtOTQwMS0wMjQyYWMxMTAwMDUiLCJwdWIiOiJzZW1jIiwidGl0bGUiOiJ2YWluZ2xvcnkiLCJzY29wZSI6ImNvbW11bml0eSIsImxpbWl0IjoxMH0.4ApfumvFdwPxUSXcOD13ulZpYeOW1GESxGtG7aKM5XY"
 api = gamelocker.Gamelocker(keyVG).Vainglory()
 msgs = dict()
 import random, verify
