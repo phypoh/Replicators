@@ -19,6 +19,11 @@ nameBOT = "EZLBot"
 OWNERS = ['198255568882761728', '164026892796690433', '102704301956149248', '139537219793715200']  # When you want to AUTHENTICATE the AUTHOR
 # serverprefixes = {}
 
+# EMBED VARIABLES
+NAME = "EZLBot"
+FOOTER = "Thanks to SEMC and MadGlory made with love ~ xoxo"
+PROFILEIMG = "http://i64.tinypic.com/2q24gsj.jpg"
+
 # CLASS containing ALL COMMANDS for THIS MODULE
 class Bot():
     """Basic bot Commands.
