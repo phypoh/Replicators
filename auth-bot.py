@@ -24,7 +24,9 @@ class Verification():
             return
         pattern_ = '{} Halcyon Potions, {} Weapon Infusions, and {} Crystal Infusions'.format(str(pattern.count(0)), str(pattern.count(1)), str(pattern.count(2)))
         await self.bot.say("Awesome. To complete the authorization process.\n• Enter a **blitz** match\n• Buy **{}** for your first {} items.\n• **You can sell them immediately at the same price.**\n• This must be your next match.\n• **Once you are done please type {}check to complete authorization process.** Once this is done, your account will be linked and authenticated permanantly.".format(pattern_,len(pattern), self.bot.command_prefix[0]))
+
         await asyncio.sleep(345)
+
         await self.bot.send_message(ctx.message.author, verify.check(ctx.message.author.id))
     @commands.command(pass_context=True)
     async def check(self,ctx):
