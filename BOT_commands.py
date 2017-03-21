@@ -13,7 +13,7 @@ bot
 from discord.ext import commands
 import config
 import main
-
+from discord.ext.commands.cooldowns import BucketType
 # BOT VARIABLES
 nameBOT = "EZLBot"
 OWNERS = ['198255568882761728', '164026892796690433', '102704301956149248', '139537219793715200']  # When you want to AUTHENTICATE the AUTHOR
