@@ -369,7 +369,7 @@ class Matchmaker():
             q['role'] = 'Carry'
         else:
             q['role'] = 'any'
-        await self.bot.say('Awesome, you\'re ready now to start finding players, do {0}queue. To update your stats when your tier changes, or you change your mind. Just do {}vgtinder again.'.format(self.bot.command_prefix[0]))
+        await self.bot.say('Awesome, you\'re ready now to start finding players, do {0}queue. To update your stats when your tier changes, or you change your mind. Just do {0}vgtinder again.'.format(self.bot.command_prefix[0]))
         p = getPlayer(m[0], ign)
         q['tier'] = p.stats['skillTier']
         q['karma'] = p.stats['karmaLevel']
