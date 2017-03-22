@@ -289,20 +289,21 @@ def getPlayerPerformanceVG(name, server="", game_mode="", days=7, auto=False):
     playerdata = []
     matchNum = 0
     size = len(matches) - 1
+    number  = 0
     for match in matches:
-        if matchNum == size:  # If MATCH is the FIRST MATCH then GET DATA
+        if number == 0:  # If MATCH is the FIRST MATCH then GET DATA
             latestmatchraw = dateutil.parser.parse(match.createdAt)
             latestmatch = latestmatchraw.strftime('%d/%m/%Y %H:%M:%S') + " GMT"
 
         gameMode.append(str(match.gameMode))
         duration.append(match.duration)
-        matchNum += 1
+        number += 1
 
         for roaster in match.rosters:
             for participant in roaster.participants:
                 if participant.player.name == name:
                     playerdata.append(participant.to_dict())  # If DATA belongs to PLAYER then KEEP
-
+        number += 1
     # FOR DEBUGGING
     # print(str(latestmatch) + " | latestmatch")
     # print(str(gameMode) + " | gameMode")
@@ -328,7 +329,7 @@ def getPlayerPerformanceVG(name, server="", game_mode="", days=7, auto=False):
     turretCaptures = []
     wentAfk = []
     winner = []
-
+    number = 0
     # Go though PLAYERDATA getting DATA needed for building a PROFILE
     for data in playerdata:
         attributes = data["attributes"]
@@ -351,10 +352,11 @@ def getPlayerPerformanceVG(name, server="", game_mode="", days=7, auto=False):
         turretCaptures.append(stats["turretCaptures"])
         wentAfk.append(stats["wentAfk"])
         winner.append(stats["winner"])
-
-        level = stats["level"]
-        karmaLevel = stats["karmaLevel"]
-        skillTier = stats["skillTier"]
+        if number == 0:
+            level = stats["level"]
+            karmaLevel = stats["karmaLevel"]
+            skillTier = stats["skillTier"]
+        number += 1
 
     # FOR DEBUGGING
     # print(str(actor) + " | actors")
