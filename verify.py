@@ -131,7 +131,8 @@ def delete(discordid):
 def confirm(discordid):
     ign  = auth[discordid]['ign']
     auth[discordid]['confirmed'] = True
-    auth['confirmed'].append(ign)
+    if ign not in auth['confirmed']
+        auth['confirmed'].append(ign)
     storeAuth()
 
 
