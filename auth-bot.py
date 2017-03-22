@@ -46,5 +46,10 @@ class Verification():
             return
         verify.confirm(did)
         await self.bot.say("K")
+    @commands.command(pass_context=True, hidden=True)
+    async def igncheck(self,ctx,did):
+        if ctx.message.author.id not in OWNERS:
+            return
+        await self.bot.say(verify.id_to_ign(did))
 def setup(bot):
     bot.add_cog(Verification(bot))
