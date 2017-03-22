@@ -87,7 +87,7 @@ def check(discordid):
         elif i == 'Crystal Infusion':
             items[items.index(i)] = 2
         else:
-            items[items.index(i)] = 10
+            pass
     if sorted(items, key=int) == sorted(auth[discordid]['pattern'], key=int): #So order doesn't matter
         auth[discordid]['confirmed']=True
         auth['confirmed'].append(ign) #adds to list of confirmed igns
