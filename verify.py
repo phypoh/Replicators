@@ -87,7 +87,11 @@ def check(discordid):
         elif i == 'Crystal Infusion':
             items[items.index(i)] = 2
         else:
-            items[items.index(i)] = 10
+            pass
+    try:
+        sorted(items, key=int)
+    except:
+        raise ValueError('Invalid Pattern:\nYours: '+ str(items) + "\nPattern: "+ str(auth[discordid]['pattern']) + '\nRemember patterns do not have to be bought in order.')
     if sorted(items, key=int) == sorted(auth[discordid]['pattern'], key=int): #So order doesn't matter
         auth[discordid]['confirmed']=True
         auth['confirmed'].append(ign) #adds to list of confirmed igns
@@ -100,7 +104,7 @@ def check(discordid):
         pattern_ = [x if x != 0 else 'Halcyon Potion' for x in auth[discordid]['pattern']]
         pattern_ = [x if x != 1 else 'Weapon Infusion' for x in pattern_] #Checks for all 1's and replaces it with Weapon Infusion
         pattern_  = [x if x != 2 else 'Crystal Infusion' for x in pattern_] #Checks for all 2's and replaces it with Crystal Infusion
-        raise ValueError('Invalid Pattern:\nYours: '+ str(items) + "\nPattern: "+ str(pattern_) + '\nRemember patterns are meant to be bought in order.')
+        raise ValueError('Invalid Pattern:\nYours: '+ str(items) + "\nPattern: "+ str(pattern_) + '\nRemember patterns do not have to be bought in order.')
 
 
 def isauth(discordid, ign): #checks if discordid is confirmed on the ign given
@@ -131,7 +135,8 @@ def delete(discordid):
 def confirm(discordid):
     ign  = auth[discordid]['ign']
     auth[discordid]['confirmed'] = True
-    auth['confirmed'].append(ign)
+    if ign not in auth['confirmed']
+        auth['confirmed'].append(ign)
     storeAuth()
 
 
