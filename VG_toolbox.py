@@ -177,7 +177,7 @@ def giveTaunt(hero):
     "catherine":"http://i.imgur.com/lBZWyLy.gif",
     "baron":"http://i.imgur.com/95tpmvA.gif",
     "fortress":"http://i.imgur.com/auCGVZ8.gif",
-    "gwen":"http://i.imgur.com/o0GAAPq.gif",
+    "gwen":"http://i.imgur.com/KhGmi7u.gif",
     "ardan":"http://i.imgur.com/0WsmyBK.gif",
     "glaive":"http://i.imgur.com/o0GAAPq.gif",
     "adagio":"http://i.imgur.com/juYeHBB.gif",
