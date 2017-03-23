@@ -164,6 +164,7 @@ def isServerVG(server):
     
 def giveTaunt(hero):
     hero = hero.lower()
+    l = ''
     taunt = {
     "koshka": "http://i.imgur.com/QWPzPSp.gif", 
     "taka":"http://i.imgur.com/0VmwoyU.gif",
@@ -183,4 +184,7 @@ def giveTaunt(hero):
     "adagio":"http://i.imgur.com/juYeHBB.gif",
     "flicker":"http://i.imgur.com/2ozomsd.gif"
     }
+    for i in taunt.keys():
+        l += '{}\n'.format(i)
+    taunt['list'] = l
     return taunt.get(hero,False)
