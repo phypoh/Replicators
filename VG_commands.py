@@ -549,9 +549,15 @@ class Vg():
 
     @commands.command(pass_context=True)
     async def taunt(hero):
+        """
+        Unleash Your Inner Troll
+        $taunt list
+        """
         url = VG_toolbox.giveTaunt(hero)
         if url == False:
             await self.bot.say("Sorry. Hero taunt not found.")
+        elif 'http' not in url:
+            await self.bot.say(url)
         else:
             em = discord.Embed()  
             em.set_image(url=url)
