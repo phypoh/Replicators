@@ -9,7 +9,7 @@ match
 """
 
 # IMPORTS
-import gamelocker
+import gamelocker, discord
 from discord.ext import commands
 import TOOL_module as tools
 import VG_module
@@ -547,5 +547,14 @@ class Vg():
         except:
             pass
 
+    @commands.command(pass_context=True)
+    async def taunt(hero):
+        url = VG_toolbox.giveTaunt(hero)
+        if url == False:
+            await self.bot.say("Sorry. Hero taunt not found.")
+        else:
+            em = discord.Embed()  
+            em.set_image(url=url)
+            await self.bot.say(embed = em)
 def setup(bot):
     bot.add_cog(Vg(bot))
