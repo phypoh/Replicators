@@ -161,3 +161,26 @@ def isServerVG(server):
 
     else:
         return False
+    
+def giveTaunt(hero):
+    hero = hero.lower()
+    taunt = {
+    "koshka": "http://i.imgur.com/QWPzPSp.gif", 
+    "taka":"http://i.imgur.com/0VmwoyU.gif",
+    "rona":"http://i.imgur.com/HZV04ew.gif",
+    "lance":"http://i.imgur.com/YxjQN8l.gif",
+    "ozo":"http://i.imgur.com/zQ914kf.gif",
+    "reim":"http://i.imgur.com/EvPLfXu.gif",
+    "krul":"http://i.imgur.com/gA0BXzV.gif",
+    "celeste":"http://i.imgur.com/WIl0nBR.gif",
+    "grumpjaw":"http://i.imgur.com/yIIujHK.gif",
+    "catherine":"http://i.imgur.com/lBZWyLy.gif",
+    "baron":"http://i.imgur.com/95tpmvA.gif",
+    "fortress":"http://i.imgur.com/auCGVZ8.gif",
+    "gwen":"http://i.imgur.com/o0GAAPq.gif",
+    "ardan":"http://i.imgur.com/0WsmyBK.gif",
+    "glaive":"http://i.imgur.com/o0GAAPq.gif",
+    "adagio":"http://i.imgur.com/juYeHBB.gif",
+    "flicker":"http://i.imgur.com/2ozomsd.gif"
+    }
+    return taunt.get(hero,False)
