@@ -3,7 +3,7 @@ from PIL import Image
 import requests
 from io import BytesIO
 from discord.ext import commands
-
+from discord.ext.commands.cooldowns import BucketType
 
 KEY = ''  # Replace with a valid subscription key (keeping the quotes in place).
 CF.Key.set(KEY)
@@ -54,6 +54,7 @@ class FaceReplace():
         self.bot = bot
 
     @commands.command(pass_context=True)
+    @commands.cooldown(1, 20, BucketType.user)
     async def bface(self,ctx, url=''):
         """
         Blackfeather is near.
