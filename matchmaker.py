@@ -195,7 +195,7 @@ class Matchmaker():
     async def on_command_error(self, error, ctx): #To explain the cooldown
         if isinstance(error, commands.errors.CommandOnCooldown):
             print(dir(error))
-            await self.bot.send_message(ctx.message.channel, "Sorry, you can't do that for the next {} minutes.".format(int(error.retry_after)//60))
+            await self.bot.send_message(ctx.message.channel, "Sorry, you can't do that for the next {} seconds.".format(int(error.retry_after)))
 
     async def on_reaction_add(self, reaction,user): #used for the menu
         if reaction.message.id in msgs.keys() and reaction.emoji == '➡' and msgs[reaction.message.id]['page'] < msgs[reaction.message.id]['num']:
