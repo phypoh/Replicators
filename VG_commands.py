@@ -547,8 +547,8 @@ class Vg():
         except:
             pass
 
-    @commands.command(pass_context=True)
-    async def taunt(hero):
+    @commands.command(pass_context=True aliases=['taunt','charm'])
+    async def charms(hero):
         """
         Unleash Your Inner Troll
         $taunt list
