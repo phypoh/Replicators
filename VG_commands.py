@@ -182,24 +182,24 @@ class Vg():
         self.bot = bot
 
     async def on_reaction_add(self, reaction,user):
-        if reaction.message.id in msgs.keys() and reaction.emoji == '➡':
+        if reaction.message.id in msgs.keys() and reaction.emoji == '➡' and msgs[reaction.message.id]['page'] < msgs[reaction.message.id]['num']:
             msg = reaction.message
             msgs[msg.id]['page'] += 1
             page = msgs[msg.id]['page']
             await self.bot.edit_message(reaction.message,new_content='Embed: ', embed=getMatches(msgs[msg.id]['ign'], msgs[msg.id]['m'][page-1], msgs[msg.id]['region'],page,msgs[msg.id]['num']))
-        elif reaction.message.id in msgs.keys() and reaction.emoji == '⬅':
+        elif reaction.message.id in msgs.keys() and reaction.emoji == '⬅' and msgs[reaction.message.id]['page'] > 1:
             msg = reaction.message
             msgs[msg.id]['page'] -= 1
             page = msgs[msg.id]['page']
             await self.bot.edit_message(reaction.message,new_content='Embed: ', embed=getMatches(msgs[msg.id]['ign'], msgs[msg.id]['m'][page-1], msgs[msg.id]['region'],page,msgs[msg.id]['num']))
 
     async def on_reaction_remove(self, reaction,user):
-        if reaction.message.id in msgs.keys() and reaction.emoji == '➡':
+        if reaction.message.id in msgs.keys() and reaction.emoji == '➡' and msgs[reaction.message.id]['page'] < msgs[reaction.message.id]['num']:
             msg = reaction.message
             msgs[msg.id]['page'] += 1
             page = msgs[msg.id]['page']
             await self.bot.edit_message(reaction.message,new_content='Embed: ', embed=getMatches(msgs[msg.id]['ign'], msgs[msg.id]['m'][page-1], msgs[msg.id]['region'],page,msgs[msg.id]['num']))
-        elif reaction.message.id in msgs.keys() and reaction.emoji == '⬅':
+        elif reaction.message.id in msgs.keys() and reaction.emoji == '⬅' and msgs[reaction.message.id]['page'] > 1:
             msg = reaction.message
             msgs[msg.id]['page'] -= 1
             page = msgs[msg.id]['page']
