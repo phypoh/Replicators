@@ -15,6 +15,7 @@ import TOOL_module as tools
 import dateutil.parser
 import VG_toolbox
 from VG_toolbox import giveMatchVG
+import telemetry_wrapper
 
 
 # VG Variables--
@@ -58,6 +59,7 @@ heroes = {
         "*Skye*": "Skye",
         "*Vox*": "Vox"
     }
+    
 match_dict = {
 "blitz_pvp_ranked": "Blitz",
 "casual_aral": "Battle Royale",
@@ -809,6 +811,16 @@ def getMatches(ign, m, region='na',page =1, num =1):
         resultcolor = 0xe22f2f
         thumburl = 'https://s1.postimg.org/y4uwz4eu7/defeat.png'
 
+    #Trophies
+    for team in range(len(m.rosters)):
+        for player_no in range(len(m.rosters[team].participants)):
+            if  m.rosters[team].participants[player_no].name == ign:
+                break
+       
+    tel = telemetry_wrapper.telemetry(m, team, player_no)
+    trophy_dict = trophies.trophy_giver(tel)
+         
+        
     if t1.stats['side'] == 'left/blue':
         t1_color = "Blue:"
         t2_color = "Orange:"
@@ -819,6 +831,7 @@ def getMatches(ign, m, region='na',page =1, num =1):
         t1_participants += '**{}** | {} | {}/{}/{}\n'.format(i.player.name, i.actor, i.stats['kills'], i.stats['deaths'], i.stats['assists'])
     for i in t2.participants:
         t2_participants += '**{}** | {} | {}/{}/{}\n'.format(i.player.name, i.actor, i.stats['kills'], i.stats['deaths'], i.stats['assists'])
+    
     details = "{} Kills {} | {} Turrets {} | {} Krakens {} | {} Aces {} | {} Gold {}".format(str(t1.stats['heroKills']), str(t2.stats['heroKills']), str(t1.stats['turretsRemaining']), str(t2.stats['turretsRemaining']), str(t1.stats['krakenCaptures']),str( t2.stats['krakenCaptures']), str(t1.stats['acesEarned']), str(t2.stats['acesEarned']), str(t1.stats['gold']), str(t2.stats['gold']))
     winchance = str(int(round(100 * (t1_tier/ (t1_tier+t2_tier)), 0)))
     krakens = str(m.rosters[0].stats['krakenCaptures'] + m.rosters[1].stats['krakenCaptures'])
@@ -826,7 +839,43 @@ def getMatches(ign, m, region='na',page =1, num =1):
     em.add_field(name = t1_color, value = t1_participants)
     em.add_field(name = t2_color, value = t2_participants)
     em.add_field(name = "Details:", value = details, inline = False)
+    
+    for category in trophy_dict:
+        if category != []:
+            for trophy in trophy_dict[category]:
+                em.add_field(name = category + " Trophy Earned!", value = "*" + trophy + "*", inline = False)
+    
     em.set_author(name=ign, icon_url="http://www.vaingloryfire.com/images/wikibase/icon/heroes/"+player.actor+".png", url = 'http://www.vaingloryfire.com/vainglory/wiki/heroes/'+player.actor)
     em.set_footer(text= ign+' | Page {}/{}'.format(str(page),str(num)), icon_url= "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcREVEEL3vFm3boDZD0aSwSPFtZ2EXJGwiEjsnvXXTluLqXrD0mknNohwA")
     em.set_thumbnail(url = thumburl)
     return em
+
+    
+def getTrophies(name, server, earned):
+    try:
+        m = apiVG.matches({"page[limit]": 50, "filter[playerNames]": name, "filter[createdAt-start]": "2017-01-01T08:25:30Z", "sort": "-createdAt"}, region=server)
+    except:
+       return "Error! Matches were not found."
+       
+    new = {"Hero" :{}, "Item":{}, "Match Goals":{}}
+
+    for match in m:
+        for team in range(len(m.rosters)):
+            for player_no in range(len(m.rosters[team].participants)):
+                if  m.rosters[team].participants[player_no].name == ign:
+                    break
+                
+        tel = telemetry_wrapper.telemetry(match, team, player_no)
+        t_list = trophies.trophy_giver(tel)
+        for cat in trophies.trophy_giver(tel):
+            for trophy in cat:
+                if trophy in earned[cat]:
+                    pass
+                else:
+                    new[cat].append(trophy)
+                    earned[cat].append(trophy)
+    return earned, new
+    
+        
+       
+        

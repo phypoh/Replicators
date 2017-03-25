@@ -28,6 +28,11 @@ msgs = dict()
 def storePlayersVGQ():
     with open("playersVGQ.pickle", "wb") as handle:
         pickle.dump(config.playersVGQ, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        
+def storeTrophies():
+    with open("playersTrophies.pickle", "wb") as handle:
+        pickle.dump(config.playersTrophies, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                
 
 
 # FOR DEBUGGING
@@ -321,7 +326,7 @@ class Vg():
                     return
 
         # FOR DEBUGGING
-        print("INPUT - PLAYER_NAME: " + str(player_name) + "   | SERVER: " + str(server) + "   | AUTO: " + str(auto))
+        #print("INPUT - PLAYER_NAME: " + str(player_name) + "   | SERVER: " + str(server) + "   | AUTO: " + str(auto))
 
         if checkName(player_name) == False:
             await self.bot.say("No valid player name was given... :sweat_smile:")
@@ -562,5 +567,104 @@ class Vg():
             em = discord.Embed()  
             em.set_image(url=url)
             await self.bot.say(embed = em)
+    
+    @commands.command(pass_context=True)
+    async def claim(name="", server="na"):
+        """
+        Update your trophy case!
+        """
+        if player_name == "" and server == "na" and auto == "False":
+
+            discordID = raw.message.author.id
+
+            # If author in VGQ then GET DATA
+            discordID = raw.message.author.id
+
+            data = config.playersVGQ.get(discordID, False)  # Get the PREFIX for SERVER
+
+            if data == False:
+                await self.bot.say("You need to add yourself to the **VGQ** first! :face_palm:\nEnter the help command followed by saveVG to see more... :stuck_out_tongue:")
+                return
+    
+            else:
+                name = data["IGN"]
+                server = data['Region']
+        
+
+        else:
+                if checkName(name) == False:
+                    await self.bot.say("No valid player name was given... :sweat_smile:")
+                    return
+                notice = "Looking for **" + str(name) + "** in the past **31** days in the **" + str(server) + "** region... :eyes:"  # MESSAGE being SENT BEFOREHAND        
+                server = giveServer(server)
+
+        msg = await self.bot.say(notice)
+            
+        """
+        Change output here!!!!!!!!!!!!
+        """
+        config.playersTrophies.setdefault(name), default=[])
+        earned = config.playersTrophies[name]
+        
+        earned, new = VG_module.getTrophies(name, server, earned)
+        
+        storeTrophies()
+        
+        if new == {"Hero" :{}, "Item":{}, "Match Goals":{}}:
+            output = "No new trophies earned..."
+        else:
+            output = discord.Embed(title = "New Trophies Earned!")
+            for cat in new:
+                if new[cat] != {}:
+                    for trophy in new[cat]:
+                        em.add_field(name = new[cat][trophy]["name"], value = new[cat][trophy]["description"])
+        
+        if type(output) == str:
+            await self.bot.edit_message(msg, output)
+            return
+    
+        else:
+            await self.bot.edit_message(msg, embed=output)
+            return
+            
+    @commands.command(pass_context=True)
+    async def trophies(name="", server="na"):
+        """
+       Show off your trophy case!
+        """
+        if player_name == "" and server == "na" and auto == "False":
+
+            discordID = raw.message.author.id
+
+            # If author in VGQ then GET DATA
+            discordID = raw.message.author.id
+
+            data = config.playersVGQ.get(discordID, False)  # Get the PREFIX for SERVER
+
+            if data == False:
+                await self.bot.say("You need to add yourself to the **VGQ** first! :face_palm:\nEnter the help command followed by saveVG to see more... :stuck_out_tongue:")
+                return
+    
+            else:
+                name = data["IGN"]
+                server = data['Region']
+        
+
+        else:
+                if checkName(name) == False:
+                    await self.bot.say("No valid player name was given... :sweat_smile:")
+                    return
+                notice = "Looking for **" + str(name) + "**'s trophies :eyes:"  
+                server = giveServer(server)
+
+        msg = await self.bot.say(notice)
+            
+        trophy_case = config.playersTrophies[name]
+        for cat in trophy_case:
+            output = discord.Embed(title = cat + " Trophies:")
+            for trophy in cat:
+                em.add_field(name = trophy_case[cat][trophy]["name"], value = trophy_case[cat][trophy]["description"])
+            await self.bot.say(output)
+        
 def setup(bot):
     bot.add_cog(Vg(bot))
