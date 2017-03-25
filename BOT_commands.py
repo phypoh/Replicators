@@ -13,6 +13,7 @@ bot
 from discord.ext import commands
 import config
 import main
+from discord.ext.commands.cooldowns import BucketType
 
 # BOT VARIABLES
 nameBOT = "EZLBot"
