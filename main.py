@@ -21,7 +21,7 @@ try:
 
 except:
     print("No Prefixes Yet")
-
+      
 try:
     with open('playersVGQ.pickle', 'rb') as handle:
         config.playersVGQ = pickle.load(handle)
@@ -32,6 +32,17 @@ try:
 except:
     print("No VGQ Yet")
 
+# Loads serverprefixes dict from the pickle file
+try:
+    with open('playersTrophies.pickle', 'rb') as handle:
+        config.playersTrophies = pickle.load(handle)
+
+    # FOR DEBUGGING
+    # print(str(config.serverprefixes) + "   |   LOADED PREFIXES")
+
+except:
+    print("No Trophies Yet")      
+    
 # Do when the BOT is ready to RUN
 @bot.event
 async def on_ready():

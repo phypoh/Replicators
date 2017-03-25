@@ -551,7 +551,7 @@ class Vg():
             pass
         except:
             pass
-
+    
     @commands.command(pass_context=True aliases=['taunt','charm'])
     async def charms(hero):
         """
@@ -567,7 +567,7 @@ class Vg():
             em = discord.Embed()  
             em.set_image(url=url)
             await self.bot.say(embed = em)
-    
+
     @commands.command(pass_context=True)
     async def claim(name="", server="na"):
         """

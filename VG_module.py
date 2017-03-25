@@ -874,6 +874,7 @@ def getTrophies(name, server, earned):
                 else:
                     new[cat].append(trophy)
                     earned[cat].append(trophy)
+                    
     return earned, new
     
         
